@@ -1,15 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Introducing Snap.svg</title>
+   <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Another DEMO for zoom/pan/drag/rotate plugin using Snap.svg</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+       <style>
+        /*html, body { margin:0; padding:0; overflow:hidden }*/
+       /* svg { position:fixed; top:0; left:0; height:100%; width:100%;
+            background: -webkit-radial-gradient(#7E7A7A, #434141, #000); 
+            background: -o-radial-gradient(#7E7A7A, #434141, #000); 
+            background: -moz-radial-gradient(#7E7A7A, #434141, #000); 
+            background: radial-gradient(#7E7A7A, #434141, #000); 
+        }*/
+        body  {
+	background: #f7f7f7;
+		}
+        .button {
+            position: fixed;
+            right: 50px;
+            bottom: 50px;
+            z-index: 100;
+        }
+        #selected{
+            color: white;
+        }
+    </style>
     <script src="js/snap.svg-min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/snap.svg.zpd.js"></script>
+   
+    
 </head>
 <body>
     <svg id="svg"></svg>
-<button type="submit" class="btn btn-default" id="myBtn">Готово</button>
+    
+   
+      
+         
+          
+     <button type="submit" class="btn btn-default" id="myBtn">Готово</button>
+    <div class="button">
+    <button id="location">To (0,0) Location</button>
+    <br/>
+    <button id="up">Up</button>
+    <button id="down">Down</button>
+    <br/>
+    <button id="left">Left</button>
+    <button id="right">Right</button>
+    <br/>
+
+    <button id="rotateL">Rotate -15 deg</button>
+    <button id="rotateR">Rotate 15 deg</button>
+    <br/>
+
+    <button id="zoom2x">Zoom To 2x</button>
+    <button id="zoom1x">Zoom To 1x</button>
+    <br/>
+
+    <button id="save">Save</button>
+    <button id="threshold">Zoom Threshold [0.5,3]</button>
+    <br/>
+
+    <button id="destroy">Destroy</button>
+    <button id="reapply">Re-Apply</button>
+    <br/>
+    -- or use arrow key --
+    <br/>
+    <span style="color: white;">Selected:</span>
+    <span id="selected"></span>
+</div>
+
+
+<!-- <button type="submit" class="btn btn-default" id="myBtn">Готово</button> -->
 <script src="js/main.js"></script>
+<!-- <script src="js/test.js"></script> -->
+<script>
+
+</script>
 </body>
 </html>

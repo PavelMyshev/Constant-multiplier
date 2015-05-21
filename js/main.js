@@ -1,5 +1,9 @@
 var snap = Snap(3000,3000);
 
+var naiveReverse = function(string) {
+    return string.split('').reverse().join('');
+    }
+
 function getDecimal(num) { // после запятой
 
   var temp = ( (num - Math.floor(num)).toFixed(1) )[2];
@@ -29,7 +33,7 @@ var middleSpace = 250;         // место для центральной ча�
 var xPoint = 100;              // начальная 'x' координата
 var yPoint = 100;		           // начальная 'y' координата
 var busLength = 1150;          // длина шин (вход, выход и т.д.)
-var logicGateAttr = {fill:"rgb(255,255,255)", stroke: "#000", strokeWidth: 2};
+var logicGateAttr = {fill:"rgb(255,255,255)", stroke: "black", strokeWidth: 2};
 var rectWidth = 4;
 var amendment = rectWidth/2;
 
@@ -109,7 +113,7 @@ var logicGate = [];     // логические вентили "AND"
 // линия, вместе с соединительными узлами
 var DiLine = {         
 	constructor: function(x1, y1, x2, y2, ln1, ln2, rn1, rn2){
-		this.line = snap.paper.line(x1, y1, x2, y2).attr({stroke: '#686868',strokeWidth: 2});
+		this.line = snap.paper.line(x1, y1, x2, y2).attr({stroke: 'gray',strokeWidth: 2});
 		
 		if (arguments.length > 4){
 		 this.leftNode = snap.paper.rect(ln1 - amendment, ln2 - amendment, rectWidth, rectWidth);
@@ -232,10 +236,267 @@ block++;
 }
 
 
+var inNumb = [];
+var outNumb = [];
+var cNumb = [];
+var hNumb = [];
+
+
+  for (var i = 0; i < base; i++){
+    
+   inNumb[i] = snap.paper.text(inputLine[base-1-i].line.attr("x1")-space/2, inputLine[base-1-i].line.attr("y1")-space/4, ''+i).attr(
+            {fontSize: '12px'});
+
+   outNumb[i] = snap.paper.text(outputLine[base-1-i].line.attr("x1")-space/2, outputLine[base-1-i].line.attr("y1")-space/4, ''+i).attr(
+            {fontSize: '12px'});
+
+  }  
+ 
+for (var i = 0; i < n; i++){
+  cNumb[i] = snap.paper.text(cLine[n-1-i].line.attr("x1")-space/2, cLine[n-1-i].line.attr("y1")-space/4, ''+i).attr(
+            {fontSize: '12px'});
+
+  hNumb[i] = snap.paper.text(hLine[n-1-i].line.attr("x1")-space/2, hLine[n-1-i].line.attr("y1")-space/4, ''+i).attr(
+            {fontSize: '12px'});
+}
+
+function sleep(ms) {
+ms += new Date().getTime();
+while (new Date() < ms){}
+} 
+
+
+       
+   
+
+// document.getElementById("myBtn").addEventListener("click", function() {
+//   var convertX = "0123";
+//   var qState = 0;
+//   var result = "";
+//     ReverseX = naiveReverse(convertX);
+    
+//     var i = 0;
+//     var timerId =  setInterval(function(){
+//       var currentInput = ReverseX.charAt(i);
+
+//       inNumb[currentInput].attr({fill:'#D00000'});
+//       inputLine[Math.abs(currentInput-(base-1))].line.attr({stroke: '#D00000'});
+      
+//       var tar = tableB[currentInput][qState];
+//       qState = getFloor(tar);
+//       result+=getDecimal(tar);
+//       i++;
+//       if(i>ReverseX.length){clearInterval(timerId);}
+      
+    
+// },2000);
+  
+
+//   }); 
+
 
 document.getElementById("myBtn").addEventListener("click", function() {
+//   var convertX = "0123";
+//   var qState = 0;
+//   var result = "";
+//     ReverseX = naiveReverse(convertX);
+    
+//     var i = 0;
+//     var timerId =  setInterval(function(){
+//       var currentInput = ReverseX.charAt(i);
 
-  inputLine[0].line.attr({stroke: '#D00000'});  
+//       inNumb[currentInput].attr({fill:'#D00000'});
+//       inputLine[Math.abs(currentInput-(base-1))].line.attr({stroke: '#D00000'});
+      
+//       var tar = tableB[currentInput][qState];
+//       qState = getFloor(tar);
+//       result+=getDecimal(tar);
+//       i++;
+//       if(i>ReverseX.length){clearInterval(timerId);}
+      
+    
+// },2000);
+var i = 0;
 
 
-  }); 
+
+     
+
+
+
+
+
+var funcs = [];
+var fTime = 2000;;
+var sTime = 4000;
+function sendInputSignal(j,i) {
+    return function() { inputLine[i].line.animate({stroke:'#D00000'}, fTime, function(){
+                        inputLine[i].line.animate({stroke:'gray'}, sTime);
+                        });
+                        lowerInLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
+                        lowerInLine[j][i].line.animate({stroke:'gray'},  sTime);
+                        });
+                        lowerInToOutLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
+                        lowerInToOutLine[j][i].line.animate({stroke:'gray'},  sTime);
+                        });
+                        // питание на с
+                        cLine[i].line.animate({stroke:'#D00000'}, fTime, function(){
+                        cLine[i].line.animate({stroke:'gray'}, sTime);
+                        });
+                        underRectLine[n-i-1].line.animate({stroke:'#D00000'}, fTime, function(){
+                        underRectLine[n-i-1].line.animate({stroke:'gray'},  sTime);
+                        });
+
+                        lowerCToHLine[n-i-1][j].line.animate({stroke:'#D00000'}, fTime, function(){
+                        lowerCToHLine[n-i-1][j].line.animate({stroke:'gray'},  sTime);
+                        });
+
+                        // upperInToOutLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
+                        // upperInToOutLine[j][i].line.animate({stroke:'gray'},  sTime);
+                        // });
+          };
+}
+
+for (var j = 0; j < n; j++) {
+    funcs[j] = sendInputSignal(j,0);
+}
+for (var j = 0; j < n; j++) {
+    funcs[j]();                        
+}
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        snap.zpd();
+   
+
+  
+
+    
+
+       
+
+
+
+    // UI improvement needed
+    var intervalF;
+    var clearIntervalF = function () {
+        clearInterval(intervalF);
+    };
+    document.getElementById('location').onmousedown = function () {
+        snap.panTo(0, 0);
+    };
+    document.getElementById('left').onmousedown = function () {
+        snap.panTo('-10');
+        intervalF = setInterval(function () {
+            snap.panTo('-10');
+        }, 100);
+    };
+    document.getElementById('left').onmouseup = clearIntervalF;
+    document.getElementById('left').onmouseleave = clearIntervalF;
+    document.getElementById('right').onmousedown = function () {
+        snap.panTo('+10');
+        intervalF = setInterval(function () {
+            snap.panTo('+10');
+        }, 100);
+    };
+    document.getElementById('right').onmouseup = clearIntervalF;
+    document.getElementById('right').onmouseleave = clearIntervalF;
+    document.getElementById('up').onmousedown = function () {
+        snap.panTo('+0', '-10');
+        intervalF = setInterval(function () {
+            snap.panTo('+0', '-10');
+        }, 100);
+    };
+    document.getElementById('up').onmouseup = clearIntervalF;
+    document.getElementById('up').onmouseleave = clearIntervalF;
+    document.getElementById('down').onmousedown = function () {
+        snap.panTo('+0', '+10');
+        intervalF = setInterval(function () {
+            snap.panTo('+0', '+10');
+        }, 100);
+    };
+    document.getElementById('down').onmouseup = clearIntervalF;
+    document.getElementById('down').onmouseleave = clearIntervalF;
+    document.getElementById('rotateL').onmousedown = function () {
+        snap.rotate(-90);
+        intervalF = setInterval(function () {
+            snap.rotate(-90);
+        }, 100);
+    };
+    document.getElementById('rotateL').onmouseup = clearIntervalF;
+    document.getElementById('rotateL').onmouseleave = clearIntervalF;
+    document.getElementById('rotateR').onmousedown = function () {
+        snap.rotate(90);
+        intervalF = setInterval(function () {
+            snap.rotate(90);
+        }, 100);
+    };
+    document.getElementById('rotateR').onmouseup = clearIntervalF;
+    document.getElementById('rotateR').onmouseleave = clearIntervalF;
+    document.getElementById('zoom2x').onmousedown = function () {
+        snap.zoomTo(2, 400);
+    };
+    document.getElementById('zoom1x').onmousedown = function () {
+        snap.zoomTo(1, 400);
+    };
+    document.getElementById('save').onmousedown = function () {
+        snap.zpd('save', function (err, data) {
+            var output = JSON.stringify(data);
+            alert('Save Data:' + output);
+        });
+    };
+    document.getElementById('threshold').onmousedown = function () {
+        snap.zoomTo(1, 400);
+        snap.zpd({ drag: true, zoomThreshold: [0.5, 3] });
+    };
+    document.onkeydown = function (e) {
+        switch(e.keyCode) {
+            case 37: // left
+                snap.panTo('-10');
+                break;
+            case 38: // up
+                snap.panTo('+0', '-10');
+                break;
+            case 39: // right
+                snap.panTo('+10');
+                break;
+            case 40: // down
+                snap.panTo('+0', '+10');
+                break;
+        }
+    };
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
