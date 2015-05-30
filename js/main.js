@@ -1,4 +1,5 @@
-var snap = Snap(3000,3000);
+// var snap = Snap(3000,3000);
+var snap = Snap("svg");
 
 var naiveReverse = function(string) {
     return string.split('').reverse().join('');
@@ -14,29 +15,60 @@ function getFloor(num) { // целая часть
   return Math.floor(num);
 }  
 
+
+
 var base = 4;  // система исчисления
-var n = 5;     // множитель
+var n = 3;     // множитель
 
-var tableB = [
+function stateTransition(q,x){
+  var result = (q + x * n).toString(base);
+  
+  return result.length > 1 ? result.slice(0,-1) : '0';
+}
+
+function output(q,x){
+  var result = (q + x * n).toString(base);
+  
+   return result[result.length-1];
+}
+// Соз­дать мно­го­мер­ный мас­сив
+var tableB = new Array(base);      
+for(var i = 0; i < base; i++)
+tableB[i] = new Array(n); 
+
+// Ини­циа­ли­зи­ро­вать B-таблицы
+for(var x = 0; x < base; x++) {
+for(q = 0; q < n; q++) {
+tableB[x][q] = stateTransition(q,x) + '.' + output(q,x);
+}
+}
+// var tableB = [
              
              
-             [     0.0, 0.1, 0.2, 0.3, 1.0],
-             [     1.1, 1.2, 1.3, 2.0, 2.1],
-             [     2.2, 2.3, 3.0, 3.1, 3.2],
-             [     3.3, 4.0, 4.1, 4.2, 4.3],
+//              [     0.0, 0.1, 0.2, 0.3, 1.0],
+//              [     1.1, 1.2, 1.3, 2.0, 2.1],
+//              [     2.2, 2.3, 3.0, 3.1, 3.2],
+//              [     3.3, 4.0, 4.1, 4.2, 4.3],
 
-                            ];
+//                             ];
 
   
 var space = 10;                // расстояние между линиями
-var middleSpace = 250;         // место для центральной части умножителя
+var middleSpace;         // место для центральной части умножителя
 var xPoint = 100;              // начальная 'x' координата
 var yPoint = 100;		           // начальная 'y' координата
-var busLength = 1150;          // длина шин (вход, выход и т.д.)
+var busLength;          // длина шин (вход, выход и т.д.) 1150
 var logicGateAttr = {fill:"rgb(255,255,255)", stroke: "black", strokeWidth: 2};
 var rectWidth = 4;
 var amendment = rectWidth/2;
-
+var defaultCL = 'gray';
+var voltageCL = '#D00000';
+function setCircuitSize(base,n){
+  middleSpace = base * 60;
+  busLength = n * (2 * space + space * base + space + space * n + space + 25 + 2 * space + space + space * base);
+}
+setCircuitSize(base,n);
+//setCircuitSize(base,n);
 // **********************
 // *** ОСНОВНЫЕ ЛИНИИ ***
 // **********************
@@ -113,7 +145,7 @@ var logicGate = [];     // логические вентили "AND"
 // линия, вместе с соединительными узлами
 var DiLine = {         
 	constructor: function(x1, y1, x2, y2, ln1, ln2, rn1, rn2){
-		this.line = snap.paper.line(x1, y1, x2, y2).attr({stroke: 'gray',strokeWidth: 2});
+		this.line = snap.paper.line(x1, y1, x2, y2).attr({stroke: defaultCL,strokeWidth: 2});
 		
 		if (arguments.length > 4){
 		 this.leftNode = snap.paper.rect(ln1 - amendment, ln2 - amendment, rectWidth, rectWidth);
@@ -189,9 +221,9 @@ for (var i = 0; i < n; i++){
 xPoint += space;
 //создаем прямоугольники
  for (var i = 0; i < base; i++){
- 	logicGate[block][i] = snap.paper.rect(xPoint, yPoint, 45, 25).attr(logicGateAttr);
- 	var t1 = snap.paper.text(xPoint+3, yPoint+15, '&'+block+','+i);
- 	xPoint += 45;
+ 	logicGate[block][i] = snap.paper.rect(xPoint, yPoint, 55, 25).attr(logicGateAttr);
+ 	var t1 = snap.paper.text(xPoint+3, yPoint+15, '&'+block.toString(base)+','+i.toString(base));
+ 	xPoint += 55;
  }
 
 yPoint = parseFloat(logicGate[block][0].attr("y")) + 25 + space;
@@ -211,6 +243,11 @@ for (var i = 0; i < base; i++){
 for (var i = 0; i < base; i++){
   var q = getFloor(tableB[i][block]);
   var x = getDecimal(tableB[i][block]);
+  q = parseInt(q,base);
+  x = parseInt(x,base);
+  q = q * 1;
+  x = x * 1;
+  
   var x1 = parseFloat(logicGate[block][i].attr("x"))+ space;
   var y1 = lowerInLine[block][i].line.attr("y1");
   var x2 = parseFloat(logicGate[block][i].attr("x"))+ space;
@@ -260,13 +297,6 @@ for (var i = 0; i < n; i++){
             {fontSize: '12px'});
 }
 
-function sleep(ms) {
-ms += new Date().getTime();
-while (new Date() < ms){}
-} 
-
-
-       
    
 
 // document.getElementById("myBtn").addEventListener("click", function() {
@@ -328,40 +358,75 @@ var i = 0;
 
 var funcs = [];
 var fTime = 2000;;
-var sTime = 4000;
-function sendInputSignal(j,i) {
-    return function() { inputLine[i].line.animate({stroke:'#D00000'}, fTime, function(){
-                        inputLine[i].line.animate({stroke:'gray'}, sTime);
+var sTime = 10000;
+function sendInputSignal(j,i,k) {
+    return function() { 
+                        // питание на i-ю линию входа
+                        inputLine[i].line.animate({stroke: voltageCL}, fTime, function(){
+                        inputLine[i].line.animate({stroke: defaultCL}, sTime);
                         });
-                        lowerInLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
-                        lowerInLine[j][i].line.animate({stroke:'gray'},  sTime);
+                        // i-я линия для каждого из j блоков, соединенных с i-й входной линией
+                        lowerInLine[j][i].line.animate({stroke:voltageCL}, fTime, function(){
+                        lowerInLine[j][i].line.animate({stroke: defaultCL},  sTime);
                         });
-                        lowerInToOutLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
-                        lowerInToOutLine[j][i].line.animate({stroke:'gray'},  sTime);
+                        // соединение вход-выход через вентиль
+                        lowerInToOutLine[j][i].line.animate({stroke:voltageCL}, fTime, function(){
+                        lowerInToOutLine[j][i].line.animate({stroke: defaultCL},  sTime);
                         });
                         // питание на с
-                        cLine[i].line.animate({stroke:'#D00000'}, fTime, function(){
-                        cLine[i].line.animate({stroke:'gray'}, sTime);
-                        });
-                        underRectLine[n-i-1].line.animate({stroke:'#D00000'}, fTime, function(){
-                        underRectLine[n-i-1].line.animate({stroke:'gray'},  sTime);
+                        cLine[k].line.animate({stroke:voltageCL}, fTime, function(){
+                        cLine[k].line.animate({stroke: defaultCL}, sTime);
                         });
 
-                        lowerCToHLine[n-i-1][j].line.animate({stroke:'#D00000'}, fTime, function(){
-                        lowerCToHLine[n-i-1][j].line.animate({stroke:'gray'},  sTime);
+                        underRectLine[n-k-1].line.animate({stroke:voltageCL}, fTime, function(){
+                        underRectLine[n-k-1].line.animate({stroke:defaultCL},  sTime);
                         });
 
+                        lowerCToHLine[n-k-1][j].line.animate({stroke:voltageCL}, fTime, function(){
+                        lowerCToHLine[n-k-1][j].line.animate({stroke:defaultCL},  sTime);
+                        });
+                        // питание на h
+                        hLine[k].line.animate({stroke:voltageCL}, fTime, function(){
+                        hLine[k].line.animate({stroke:defaultCL}, sTime);
+                        });
+
+                        upperHLine[j][k].line.animate({stroke:voltageCL}, fTime, function(){
+                        upperHLine[j][k].line.animate({stroke:defaultCL}, sTime);
+                        });
+
+                       
                         // upperInToOutLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
                         // upperInToOutLine[j][i].line.animate({stroke:'gray'},  sTime);
                         // });
+  
+  }                      
           };
-}
 
-for (var j = 0; j < n; j++) {
-    funcs[j] = sendInputSignal(j,0);
+// var funcsT = [];
+// function sendT(j,i) {
+//     return function() { 
+//    upperCToHLine[i][j].line.animate({stroke:voltageCL}, fTime, function(){
+//                                 upperCToHLine[i][j].line.animate({stroke:defaultCL},  sTime);
+//                                 });
+//     }
+//   }
+  var yyy = 0;
+for (var p = 0; p < n; p++) {
+    funcs[p] = sendInputSignal(p,yyy,yyy);
+     // for (var i = 0; i < base; i++) {
+     //                      for (var j = 0; j < n; j++){
+     //                          var q = getFloor(tableB[i][j]);
+     //                          q = parseInt(q,base);
+     //                          q = q * 1;
+     //                          if (q == yyy){
+     //                            funcsT[p] = sendT(i,j);
+     //                          }
+     //                      }
+     //                    }
 }
 for (var j = 0; j < n; j++) {
-    funcs[j]();                        
+    funcs[j](); 
+    // funcsT[j]();                       
 }
 
 
@@ -369,33 +434,7 @@ for (var j = 0; j < n; j++) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        snap.zpd();
-   
-
-  
-
-    
-
-       
-
-
+    snap.zpd();
 
     // UI improvement needed
     var intervalF;
@@ -403,7 +442,7 @@ for (var j = 0; j < n; j++) {
         clearInterval(intervalF);
     };
     document.getElementById('location').onmousedown = function () {
-        snap.panTo(0, 0);
+        snap.panTo(300, 0);
     };
     document.getElementById('left').onmousedown = function () {
         snap.panTo('-10');
