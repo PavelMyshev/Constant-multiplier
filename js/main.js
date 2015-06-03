@@ -17,8 +17,8 @@ function getFloor(num) { // целая часть
 
 
 
-var base = 4;  // система исчисления
-var n = 3;     // множитель
+var base = 6;  // система исчисления
+var n = 4;     // множитель
 
 function stateTransition(q,x){
   var result = (q + x * n).toString(base);
@@ -42,16 +42,6 @@ for(q = 0; q < n; q++) {
 tableB[x][q] = stateTransition(q,x) + '.' + output(q,x);
 }
 }
-// var tableB = [
-             
-             
-//              [     0.0, 0.1, 0.2, 0.3, 1.0],
-//              [     1.1, 1.2, 1.3, 2.0, 2.1],
-//              [     2.2, 2.3, 3.0, 3.1, 3.2],
-//              [     3.3, 4.0, 4.1, 4.2, 4.3],
-
-//                             ];
-
   
 var space = 10;                // расстояние между линиями
 var middleSpace;         // место для центральной части умножителя
@@ -62,10 +52,11 @@ var logicGateAttr = {fill:"rgb(255,255,255)", stroke: "black", strokeWidth: 2};
 var rectWidth = 4;
 var amendment = rectWidth/2;
 var defaultCL = 'gray';
+var defaultCN = 'black'
 var voltageCL = '#D00000';
 function setCircuitSize(base,n){
   middleSpace = base * 60;
-  busLength = n * (2 * space + space * base + space + space * n + space + 25 + 2 * space + space + space * base);
+  busLength = n * (10 +            2 * space + space * base + space + space * n + space + 25 + 2 * space + space + space * base);
 }
 setCircuitSize(base,n);
 //setCircuitSize(base,n);
@@ -158,12 +149,20 @@ var DiLine = {
 	};
   
 			
+var g = snap.group();
+ // var r = snap.paper.line(10, 10, 100, 100).attr({stroke: defaultCL,strokeWidth: 2});
+ // var c = snap.paper.line(15, 10, 150, 150).attr({stroke: defaultCL,strokeWidth: 2});
+
+// g.add(r);
+// g.add(c);
+//var g = snap.group(r,c);
 
 // рисуем линии входа
 for (var i = 0; i < base; i++){
   
     inputLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
     xPoint += space;
+    g.add(inputLine[i].line);
 }
 
 // сделаем двойной пробел между линиями входа и линиями С
@@ -234,8 +233,8 @@ yPoint += space;
 
  // нижние линии, идущие на вход
 for (var i = 0; i < base; i++){
-	lowerInLine[block][i] = Object.create(DiLine).constructor(inputLine[i].line.attr("x1"), yPoint, hLine[0].line.attr("x1") - space, yPoint,
-															  inputLine[i].line.attr("x1"), yPoint);
+	lowerInLine[block][i] = Object.create(DiLine).constructor(inputLine[base -1 - i].line.attr("x1"), yPoint, hLine[0].line.attr("x1") - space, yPoint,
+															  inputLine[base -1 - i].line.attr("x1"), yPoint);
 	yPoint += space;
 }
 
@@ -299,138 +298,221 @@ for (var i = 0; i < n; i++){
 
    
 
-// document.getElementById("myBtn").addEventListener("click", function() {
-//   var convertX = "0123";
-//   var qState = 0;
-//   var result = "";
-//     ReverseX = naiveReverse(convertX);
+var fTime = 500;
+var sTime = 3000;
+var delay = fTime + sTime * 2;
+
+                    
+
+function prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,x,q){
+  //console.table(tableB);
+  var normX = x;
+  var normQ = q;
+  x = base - 1 - x;
+  q = n -1 - q;
+  for (var i = 0; i < n; i++){
+    // x линия для каждого из i блоков, соединенных с x входной линией
+    _lowerInLine.push(lowerInLine[i][normX]);
+    // соединение вход-выход через вентиль
+    _lowerInToOutLine.push(lowerInToOutLine[i][normX]);
+
+    _upperHLine.push(upperHLine[i][q]);
+  }
+
+
+  for (var i = 0; i < base; i++){
+    _lowerCToHLine.push(lowerCToHLine[n-q-1][i]);
     
-//     var i = 0;
-//     var timerId =  setInterval(function(){
-//       var currentInput = ReverseX.charAt(i);
+  }
 
-//       inNumb[currentInput].attr({fill:'#D00000'});
-//       inputLine[Math.abs(currentInput-(base-1))].line.attr({stroke: '#D00000'});
-      
-//       var tar = tableB[currentInput][qState];
-//       qState = getFloor(tar);
-//       result+=getDecimal(tar);
-//       i++;
-//       if(i>ReverseX.length){clearInterval(timerId);}
-      
-    
-// },2000);
-  
-
-//   }); 
-
-
-document.getElementById("myBtn").addEventListener("click", function() {
-//   var convertX = "0123";
-//   var qState = 0;
-//   var result = "";
-//     ReverseX = naiveReverse(convertX);
-    
-//     var i = 0;
-//     var timerId =  setInterval(function(){
-//       var currentInput = ReverseX.charAt(i);
-
-//       inNumb[currentInput].attr({fill:'#D00000'});
-//       inputLine[Math.abs(currentInput-(base-1))].line.attr({stroke: '#D00000'});
-      
-//       var tar = tableB[currentInput][qState];
-//       qState = getFloor(tar);
-//       result+=getDecimal(tar);
-//       i++;
-//       if(i>ReverseX.length){clearInterval(timerId);}
-      
-    
-// },2000);
-var i = 0;
+  for (var i = 0; i < base; i++) {
+    for (var j = 0; j < n; j++){
+      var qq = getFloor(tableB[i][j]);
+                        qq = parseInt(qq,base);
+                        qq = qq * 1;
+                        if (qq == normQ){_upperCToHLine.push(upperCToHLine[j][i]); }
+    }
+  }
 
 
 
-     
-
-
-
-
-
-var funcs = [];
-var fTime = 2000;;
-var sTime = 10000;
-function sendInputSignal(j,i,k) {
-    return function() { 
-                        // питание на i-ю линию входа
-                        inputLine[i].line.animate({stroke: voltageCL}, fTime, function(){
-                        inputLine[i].line.animate({stroke: defaultCL}, sTime);
-                        });
-                        // i-я линия для каждого из j блоков, соединенных с i-й входной линией
-                        lowerInLine[j][i].line.animate({stroke:voltageCL}, fTime, function(){
-                        lowerInLine[j][i].line.animate({stroke: defaultCL},  sTime);
-                        });
-                        // соединение вход-выход через вентиль
-                        lowerInToOutLine[j][i].line.animate({stroke:voltageCL}, fTime, function(){
-                        lowerInToOutLine[j][i].line.animate({stroke: defaultCL},  sTime);
-                        });
-                        // питание на с
-                        cLine[k].line.animate({stroke:voltageCL}, fTime, function(){
-                        cLine[k].line.animate({stroke: defaultCL}, sTime);
-                        });
-
-                        underRectLine[n-k-1].line.animate({stroke:voltageCL}, fTime, function(){
-                        underRectLine[n-k-1].line.animate({stroke:defaultCL},  sTime);
-                        });
-
-                        lowerCToHLine[n-k-1][j].line.animate({stroke:voltageCL}, fTime, function(){
-                        lowerCToHLine[n-k-1][j].line.animate({stroke:defaultCL},  sTime);
-                        });
-                        // питание на h
-                        hLine[k].line.animate({stroke:voltageCL}, fTime, function(){
-                        hLine[k].line.animate({stroke:defaultCL}, sTime);
-                        });
-
-                        upperHLine[j][k].line.animate({stroke:voltageCL}, fTime, function(){
-                        upperHLine[j][k].line.animate({stroke:defaultCL}, sTime);
-                        });
+}
 
                        
-                        // upperInToOutLine[j][i].line.animate({stroke:'#D00000'}, fTime, function(){
-                        // upperInToOutLine[j][i].line.animate({stroke:'gray'},  sTime);
-                        // });
+function takt(q,x){
   
-  }                      
-          };
+  var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
+      _lowerCToHLine = [], _upperCToHLine = [];
+  prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,x,q);
 
-// var funcsT = [];
-// function sendT(j,i) {
-//     return function() { 
-//    upperCToHLine[i][j].line.animate({stroke:voltageCL}, fTime, function(){
-//                                 upperCToHLine[i][j].line.animate({stroke:defaultCL},  sTime);
-//                                 });
-//     }
-//   }
-  var yyy = 0;
-for (var p = 0; p < n; p++) {
-    funcs[p] = sendInputSignal(p,yyy,yyy);
-     // for (var i = 0; i < base; i++) {
-     //                      for (var j = 0; j < n; j++){
-     //                          var q = getFloor(tableB[i][j]);
-     //                          q = parseInt(q,base);
-     //                          q = q * 1;
-     //                          if (q == yyy){
-     //                            funcsT[p] = sendT(i,j);
-     //                          }
-     //                      }
-     //                    }
+                        var normX = x;
+                        var normQ = q;
+
+                        x = base - 1 - x;
+                        q = n -1 - q;
+                        // питание на линию входа
+                        inputLine[x].line.animate({stroke: voltageCL}, fTime, function(){
+                        inputLine[x].line.animate({stroke: defaultCL}, sTime);
+                        });
+                        // числа на входе
+                        inNumb[base-1-x].animate({fill: voltageCL}, fTime, function(){
+                        inNumb[base-1-x].animate({fill: defaultCN}, sTime);
+                        });
+
+                        _lowerInLine.forEach( function(elem,i) {
+                          elem.line.animate({stroke:voltageCL}, fTime, function(){
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        });
+                        });
+
+                        _lowerInToOutLine.forEach( function(elem,i) {
+                          elem.line.animate({stroke:voltageCL}, fTime, function(){
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        });
+                        });
+
+                        // питание на с
+                        cLine[q].line.animate({stroke:voltageCL}, fTime, function(){
+                        cLine[q].line.animate({stroke: defaultCL}, sTime);
+                        });
+                        // числа на с
+                        cNumb[n-1-q].animate({fill: voltageCL}, fTime, function(){
+                        cNumb[n-1-q].animate({fill: defaultCN}, sTime);
+                        });
+
+                        underRectLine[n-q-1].line.animate({stroke:voltageCL}, fTime, function(){
+                        underRectLine[n-q-1].line.animate({stroke:defaultCL},  sTime);
+                        });
+
+                        _lowerCToHLine.forEach( function(elem,i) {
+                          elem.line.animate({stroke:voltageCL}, fTime, function(){
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        });
+                        });
+
+                        // питание на h
+                        hLine[q].line.animate({stroke:voltageCL}, fTime, function(){
+                        hLine[q].line.animate({stroke:defaultCL}, sTime);
+                        });
+                        
+                        // числа на h
+                        hNumb[n-1-q].animate({fill: voltageCL}, fTime, function(){
+                        hNumb[n-1-q].animate({fill: defaultCN}, sTime);
+                        });
+
+                        _upperHLine.forEach( function(elem,i) {
+                          elem.line.animate({stroke:voltageCL}, fTime, function(){
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        });
+                        });
+                        
+                        _upperCToHLine.forEach( function(elem,i) {
+                          elem.line.animate({stroke:voltageCL}, fTime, function(){
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        });
+                        });
+
+                        logicGate[normQ][normX].animate({ fill: voltageCL}, fTime, function(){
+                        logicGate[normQ][normX].animate({fill: "white"}, sTime);
+                        });
+
+                        upperCToHLine[n-q-1][normX].line.animate({stroke:"green"}, fTime, function(){
+                        upperCToHLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+                        });
+
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke:"green"}, fTime, function(){
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+                        });
+
+
+                        var qqq = getFloor(tableB[normX][normQ]);
+                        var xxx = getDecimal(tableB[normX][normQ]);
+                        qqq = parseInt(qqq,base);
+                        xxx = parseInt(xxx,base);
+                        qqq = qqq * 1;
+                        xxx = xxx * 1;
+                        
+
+                        upperHLine[normQ][n-1-qqq].line.animate({stroke:"green"}, fTime, function(){
+                        upperHLine[normQ][n-1-qqq].line.animate({stroke: defaultCL}, sTime);
+                        });
+
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke:"green"}, fTime, function(){
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
+                        });
+                        
+                        hLine[n-1-qqq].line.animate({stroke:"green"}, fTime, function(){
+                        hLine[n-1-qqq].line.animate({stroke: defaultCL}, sTime);
+                        });
+
+                        // числа на h
+                        hNumb[qqq].animate({fill: "green"}, fTime, function(){
+                        hNumb[qqq].animate({fill: defaultCN}, sTime);
+                        });
+
+                        outputLine[base - 1 - xxx].line.animate({stroke:"green"}, fTime, function(){
+                        outputLine[base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
+                        });
+
+                        //числа на выходе
+                        outNumb[xxx].animate({fill: "green"}, fTime, function(){
+                        outNumb[xxx].animate({fill: defaultCN}, sTime);
+                        });
+                        
 }
-for (var j = 0; j < n; j++) {
-    funcs[j](); 
-    // funcsT[j]();                       
+
+  //setInterval(takt, 5000,0,0);
+
+  function runMachine(q, _number){
+
+      var number = _number;
+      var currentState = q;
+      var currentInput;       // очередной разряд входного числа
+      var currentCell;        // ячейка таблицы для выбора q и x
+      var currentOutput;      // очередной разряд результата умножения
+      var result = "";
+   
+      var i = number.length - 1; // т.к. в начале на вход подают младшие разряды числа
+      var timerId =  setInterval(function(){
+
+       currentInput = i >= 0 ? number.charAt(i) : '0'; 
+       currentInput = +currentInput;      // унарный плюс для преобразования в число
+       takt(currentState,currentInput);
+
+       if(currentInput == 0 && currentState == 0 && currentOutput == 0 ){clearInterval(timerId);}
+
+       i--;
+       currentCell = tableB[currentInput][currentState];
+       currentState = getFloor(currentCell);
+       currentOutput = getDecimal(currentCell);
+       result += currentOutput;
+
+       
+       
+  
+  },delay);
 }
 
+//   function runMachine(q, _number){
 
-});
+      
+   
+//       var i = number.length - 1; // т.к. в начале на вход подают младшие разряды числа
+//       var timerId =  setInterval(function go(){
+
+//        currentInput = i >= 0 ? number.charAt(i) : '0'; 
+//        currentInput = +currentInput;      // унарный плюс для преобразования в число
+//        takt(currentState,currentInput);
+
+//        if(есть что выполнять){setTimeout(go, delay);}       
+       
+  
+//   },delay);
+// }
+
+
+   runMachine(0,"012321");
+
 
 
 
@@ -492,22 +574,10 @@ for (var j = 0; j < n; j++) {
     };
     document.getElementById('rotateR').onmouseup = clearIntervalF;
     document.getElementById('rotateR').onmouseleave = clearIntervalF;
-    document.getElementById('zoom2x').onmousedown = function () {
-        snap.zoomTo(2, 400);
-    };
-    document.getElementById('zoom1x').onmousedown = function () {
-        snap.zoomTo(1, 400);
-    };
-    document.getElementById('save').onmousedown = function () {
-        snap.zpd('save', function (err, data) {
-            var output = JSON.stringify(data);
-            alert('Save Data:' + output);
-        });
-    };
-    document.getElementById('threshold').onmousedown = function () {
-        snap.zoomTo(1, 400);
-        snap.zpd({ drag: true, zoomThreshold: [0.5, 3] });
-    };
+    
+    
+    
+    
     document.onkeydown = function (e) {
         switch(e.keyCode) {
             case 37: // left
