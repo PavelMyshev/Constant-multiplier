@@ -1,0 +1,21 @@
+body  {
+	
+    background: #0C4E20;
+    
+
+}
+.controls {
+    position: fixed;
+    right: 50px;
+    bottom: 50px;
+    z-index: 100;
+}
+label {
+color: #FFF; 
+}
+/*.input-cl{
+    display: inline-block;
+}*/
+.state-cl{
+    display: inline-block;
+}

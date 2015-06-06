@@ -4,29 +4,10 @@
    <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Another DEMO for zoom/pan/drag/rotate plugin using Snap.svg</title>
+    <title>Machine</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-       <style>
-        /*html, body { margin:0; padding:0; overflow:hidden }*/
-       /* svg { position:fixed; top:0; left:0; height:100%; width:100%;
-            background: -webkit-radial-gradient(#7E7A7A, #434141, #000); 
-            background: -o-radial-gradient(#7E7A7A, #434141, #000); 
-            background: -moz-radial-gradient(#7E7A7A, #434141, #000); 
-            background: radial-gradient(#7E7A7A, #434141, #000); 
-        }*/
-        body  {
-	background: #f7f7f7;
-		}
-        .button {
-            position: fixed;
-            right: 50px;
-            bottom: 50px;
-            z-index: 100;
-        }
-        #selected{
-            color: white;
-        }
-    </style>
+    <link href="css/multiplier.css" rel="stylesheet">
+
     <script src="js/snap.svg-min.js"></script>
     <script src="js/snap.svg.zpd.js"></script>
    
@@ -34,46 +15,63 @@
 </head>
 <body>
      <svg id="svg" width="2000" height="3000"></svg>
-    
-   
-      
          
-          
-     
-    <div class="button">
-    <button id="location">To (0,0) Location</button>
-    <br/>
-    <button id="up">Up</button>
-    <button id="down">Down</button>
-    <br/>
-    <button id="left">Left</button>
-    <button id="right">Right</button>
-    <br/>
+    <div class="controls">
 
-    <button id="rotateL">Rotate -90 deg</button>
-    <button id="rotateR">Rotate  90 deg</button>
-    <br/>
-
+    <div class="input-cl">    
+    <label for="input">Input</label>    
+    <input class="form-control" id="input" type="text" placeholder="multiplicand">
+    </div>
+    <div class="state-cl">
+    <label for="state">State</label>
+    <select class="form-control" id="state">
+        <option>0</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+    </select>
+    </div>
+    <button type="button" class="btn btn-default btn-sm" id="run">
+    <span class="glyphicon glyphicon-play"></span>
+    Run
+    </button>
+    <button type="button" class="btn btn-default btn-sm" id="takt">
+    <span class="glyphicon glyphicon-step-forward"></span>
+    Takt
+    </button>
+    <br/><br/>
     
+    <div class="form-group" id="outForm">
+    <label for="output">Output</label>
+    <input class="form-control has-warning" id="output" type="text" placeholder="product">
+    </div>
+    <br/> <br/>
 
+    <button type="button" class="btn btn-default btn-sm" id="left">
+    <span class="glyphicon glyphicon-arrow-left"></span>
+    </button>
     
-    
-    
+    <button type="button" class="btn btn-default btn-sm" id="up">
+    <span class="glyphicon glyphicon-arrow-up"></span>
+    </button>
 
-    <button id="myBtn">Готово</button>
+    <button type="button" class="btn btn-default btn-sm" id="down">
+    <span class="glyphicon glyphicon-arrow-down"></span>
+    </button>
+    
+    <button type="button" class="btn btn-default btn-sm" id="right">
+    <span class="glyphicon glyphicon-arrow-right"></span>
+    </button>
+
     <br/>
-    -- or use arrow key --
     <br/>
-    <span style="color: white;">Selected:</span>
-    <span id="selected"></span>
-</div>
+    <button type="button" class="btn btn-default btn-sm" id="location">To (0,0) Location</button>
+    <br/> <br/>
+    <button type="button" class="btn btn-default btn-sm" id="rotateL">Rotate -90 deg</button>
+    <button type="button" class="btn btn-default btn-sm" id="rotateR">Rotate  90 deg</button>
+    </div>
 
-
-<!-- <button type="submit" class="btn btn-default" id="myBtn">Готово</button> -->
 <script src="js/main.js"></script>
-<!-- <script src="js/test.js"></script> -->
-<script>
 
-</script>
 </body>
 </html>
