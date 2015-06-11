@@ -19,3 +19,11 @@ color: #FFF;
 .state-cl{
     display: inline-block;
 }
+.download { 
+  background: #333; 
+  color: #FFF; 
+  font-weight: 900; 
+  border: 2px solid #B10000; 
+  padding: 4px; 
+  margin:4px;
+}
