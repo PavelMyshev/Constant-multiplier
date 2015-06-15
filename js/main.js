@@ -1,42 +1,50 @@
 // var snap = Snap(3000,3000);
 var snap = Snap("svg");
 
-var base = 4;  // система исчисления
-var n = 3;     // множитель
+function getDecimal(num) { // после запятой
 
-// функция переходов
+  var temp = ( (num - Math.floor(num)).toFixed(1) )[2];
+  return 1 * temp;
+}
+
+function getFloor(num) { // целая часть
+  return Math.floor(num);
+}  
+
+
+
+var base = 4;  // система исчисления
+var n = 4;     // множитель
+
 function stateTransition(q,x){
   var result = (q + x * n).toString(base);
   
   return result.length > 1 ? result.slice(0,-1) : '0';
 }
 
-//функция выходов
 function output(q,x){
   var result = (q + x * n).toString(base);
   
    return result[result.length-1];
 }
-
-// таблица переходов/выходных состояний
+// Соз­дать мно­го­мер­ный мас­сив
 var tableB = new Array(base);      
-for(var i = 0; i < base; i++){
-	tableB[i] = new Array(n); 
-}
+for(var i = 0; i < base; i++)
+tableB[i] = new Array(n); 
 
-// ини­циа­ли­зи­ро­вать B-таблицу
+// Ини­циа­ли­зи­ро­вать B-таблицы
 for(var x = 0; x < base; x++) {
-	for(q = 0; q < n; q++) {
-		tableB[x][q] = stateTransition(q,x) + '.' + output(q,x);
-	}
+for(q = 0; q < n; q++) {
+tableB[x][q] = stateTransition(q,x) + '.' + output(q,x);
 }
-console.log(tableB);
+}
 
-var space = 10;          // расстояние между линиями
+
+var space = 10;                // расстояние между линиями
 var middleSpace;         // место для центральной части умножителя
-var xPoint = 100;        // начальная 'x' координата
-var yPoint = 100;		 // начальная 'y' координата
-var busLength;           // длина шин (вход, выход и т.д.) 1150 
+var xPoint = 100;              // начальная 'x' координата
+var yPoint = 100;		           // начальная 'y' координата
+var busLength;          // длина шин (вход, выход и т.д.) 1150 
 var logicGateAttr;
 var lineNodeAttr;
 var numbAttr;
@@ -46,18 +54,6 @@ var rectWidth = 4;
 var amendment = rectWidth/2;
 var defaultCL;
 var voltageCL;
-
-function nextOutput(num) { // после запятой
-
-  var temp = ( (num - Math.floor(num)).toFixed(1) )[2];
-  return 1 * temp;
-}
-
-function nextState(num) { // целая часть
-  return Math.floor(num);
-}  
-
-
 
 function setCircuitSize(base,n){
   middleSpace = base * 60;
@@ -241,6 +237,14 @@ var DiLine = {
 	};
   
 			
+//var g = snap.group();
+ // var r = snap.paper.line(10, 10, 100, 100).attr({stroke: defaultCL,strokeWidth: 2});
+ // var c = snap.paper.line(15, 10, 150, 150).attr({stroke: defaultCL,strokeWidth: 2});
+
+// g.add(r);
+// g.add(c);
+//var g = snap.group(r,c);
+
 // рисуем линии входа
 for (var i = 0; i < base; i++){
   
@@ -324,8 +328,8 @@ for (var i = 0; i < base; i++){
 
 //вертикальные линии, соединяющие вход и выход
 for (var i = 0; i < base; i++){
-  var q = nextState(tableB[i][block]);
-  var x = nextOutput(tableB[i][block]);
+  var q = getFloor(tableB[i][block]);
+  var x = getDecimal(tableB[i][block]);
   q = parseInt(q,base);
   x = parseInt(x,base);
   q = q * 1;
@@ -379,84 +383,38 @@ for (var i = 0; i < n; i++){
    
 
 var fTime = 500;
-var sTime = 1000;
+var sTime = 3000;
 var delay = fTime + sTime * 2;
 
                     
-// функция группирует линии, по которым должен пройти сигнал
-function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG){
 
-  
-  var tailMinusX = base - 1 - x;
-  var tailMinusQ = n -1 - q;
-
+function prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,x,q){
+  //console.table(tableB);
+  var normX = x;
+  var normQ = q;
+  x = base - 1 - x;
+  q = n -1 - q;
   for (var i = 0; i < n; i++){
     // x линия для каждого из i блоков, соединенных с x входной линией
-    _lowerInLine.push(lowerInLine[i][x]);
+    _lowerInLine.push(lowerInLine[i][normX]);
     // соединение вход-выход через вентиль
-    _lowerInToOutLine.push(lowerInToOutLine[i][x]);
-    // горизонтальные линии, идущие на H
-    _upperHLine.push(upperHLine[i][tailMinusQ]);
+    _lowerInToOutLine.push(lowerInToOutLine[i][normX]);
+
+    _upperHLine.push(upperHLine[i][q]);
   }
 
-  // нижние линии под вентилем, идущие на H
+
   for (var i = 0; i < base; i++){
-    _lowerCToHLine.push(lowerCToHLine[q][i]);
+    _lowerCToHLine.push(lowerCToHLine[n-q-1][i]);
     
   }
-  // верхние линии под вентилем, идущие на H
-  // после подачи сигнала на i-ю линию C, активируется i-я линия H
-  // нужно найти, какие upperCToHLine затронет i-й сигнал на H
-  // для этого смотрим по B-таблице, для каких x и q будет состояние,
-  // соответствующее i-му сигналу.
-  // Проходим по столбцам. Столбец соответствует блоку вентилей.
-  for (var j = 0; j < n; j++) {
-    for (var i = 0; i < base; i++){
-      var currentQ = nextState(tableB[i][j]);
-      // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentQ = parseInt(currentQ,base);
-                        currentQ = +currentQ;
-                        if (currentQ == q){_upperCToHLine.push(upperCToHLine[j][i]); }
-    }
-  }
 
-  // После прохождения сигнала черезе вентиль, сигнал пойдет
-  // на линию H и линию Output. На все линии, связанные с данными, 
-  // должен пойти сигнал.
-  var nextQ = nextState(tableB[x][q]);
-  var nextX = nextOutput(tableB[x][q]);
-  nextQ = parseInt(nextQ,base);
-  nextX = parseInt(nextX,base);
-  nextQ = +nextQ;
-  nextX = +nextX;
-console.log(nextX);
-console.log(nextQ);
-	for (var i = 0; i < n; i++){
-    // x линия для каждого из i блоков, соединенных с x входной линией
-    _upperOutLineAfterWorkingLG.push(upperOutLine[i][base-1-nextX]);
-    
-    // горизонтальные линии, идущие на H
-    _upperHLineAfterWorkingLG.push(upperHLine[i][n-1-nextQ]);
-  } 
-
-  for (var j = 0; j < n; j++) {
-    for (var i = 0; i < base; i++){
-      var currentQ = nextState(tableB[i][j]);
-      // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentQ = parseInt(currentQ,base);
-                        currentQ = +currentQ;
-                        if (currentQ == nextQ){_upperCToHLineAfterWorkingLG.push(upperCToHLine[j][i]); }
-    }
-  }
-
-    for (var j = 0; j < n; j++) {
-    for (var i = 0; i < base; i++){
-      var currentX = nextOutput(tableB[i][j]);
-      // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentX = parseInt(currentX,base);
-                        currentX = +currentX;
-                        if (currentX == nextX){_upperInToOutLineAfterWorkingLG.push(upperInToOutLine[j][i]); }
+  for (var i = 0; i < base; i++) {
+    for (var j = 0; j < n; j++){
+      var qq = getFloor(tableB[i][j]);
+                        qq = parseInt(qq,base);
+                        qq = qq * 1;
+                        if (qq == normQ){_upperCToHLine.push(upperCToHLine[j][i]); }
     }
   }
 
@@ -464,72 +422,25 @@ console.log(nextQ);
 
 }
 
-// document.getElementById("run").addEventListener("click", function() {
-
-//     var number = document.getElementById("input").value;
-//     var state = document.getElementById("state");
-//     var q = state.options[state.selectedIndex].value;
-//     q = +q;
-    
-    
-//     //takt(q,number);  
-//     //console.log("q is : " + q);
-//     var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
-//       _lowerCToHLine = [], _upperCToHLine = [];
-
-//   prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,0,q);
-
-   
-
-// function testPrepare(){
-//     _lowerInLine.forEach( function(elem,i) {
-//                           elem.line.animate({stroke:voltageCL}, fTime);
-//                         });
-    
-//     _lowerInToOutLine.forEach( function(elem,i) {
-//                           elem.line.animate({stroke:voltageCL}, fTime);
-//                         });
-   
-//     _upperHLine.forEach( function(elem,i) {
-//                           elem.line.animate({stroke:voltageCL}, fTime);
-//                         });
-  
-
-  
-//     _lowerCToHLine.forEach( function(elem,i) {
-//                           elem.line.animate({stroke:voltageCL}, fTime);
-//                         });
-    
-  
-// _upperCToHLine.forEach( function(elem,i) {
-//                           elem.line.animate({stroke:voltageCL}, fTime);
-//                         });
-// }
-
-
-// }); 
-                      
+                       
 function takt(q,x){
   
   var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
-      _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
-       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [];
+      _lowerCToHLine = [], _upperCToHLine = [];
+  prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,x,q);
 
-  prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG);
+                        var normX = x;
+                        var normQ = q;
 
-                       
-                        var tailMinusX = base - 1 - x;
-  						var tailMinusQ = n -1 - q;
-
+                        x = base - 1 - x;
+                        q = n -1 - q;
                         // питание на линию входа
-                        inputLine[tailMinusX].line.animate({stroke: voltageCL}, fTime, function(){
-                        inputLine[tailMinusX].line.animate({stroke: defaultCL}, sTime);
+                        inputLine[x].line.animate({stroke: voltageCL}, fTime, function(){
+                        inputLine[x].line.animate({stroke: defaultCL}, sTime);
                         });
-
                         // числа на входе
-                        inNumb[x].animate(VoltNumbAttr, fTime, function(){
-                        inNumb[x].animate(numbAttr, sTime);
+                        inNumb[base-1-x].animate(VoltNumbAttr, fTime, function(){
+                        inNumb[base-1-x].animate(numbAttr, sTime);
                         });
 
                         _lowerInLine.forEach( function(elem,i) {
@@ -545,16 +456,16 @@ function takt(q,x){
                         });
 
                         // питание на с
-                        cLine[tailMinusQ].line.animate({stroke:voltageCL}, fTime, function(){
-                        cLine[tailMinusQ].line.animate({stroke: defaultCL}, sTime);
+                        cLine[q].line.animate({stroke:voltageCL}, fTime, function(){
+                        cLine[q].line.animate({stroke: defaultCL}, sTime);
                         });
                         // числа на с
-                        cNumb[q].animate(VoltNumbAttr, fTime, function(){
-                        cNumb[q].animate(numbAttr, sTime);
+                        cNumb[n-1-q].animate(VoltNumbAttr, fTime, function(){
+                        cNumb[n-1-q].animate(numbAttr, sTime);
                         });
 
-                        underRectLine[q].line.animate({stroke:voltageCL}, fTime, function(){
-                        underRectLine[q].line.animate({stroke:defaultCL},  sTime);
+                        underRectLine[n-q-1].line.animate({stroke:voltageCL}, fTime, function(){
+                        underRectLine[n-q-1].line.animate({stroke:defaultCL},  sTime);
                         });
 
                         _lowerCToHLine.forEach( function(elem,i) {
@@ -564,13 +475,13 @@ function takt(q,x){
                         });
 
                         // питание на h
-                        hLine[tailMinusQ].line.animate({stroke:voltageCL}, fTime, function(){
-                        hLine[tailMinusQ].line.animate({stroke:defaultCL}, sTime);
+                        hLine[q].line.animate({stroke:voltageCL}, fTime, function(){
+                        hLine[q].line.animate({stroke:defaultCL}, sTime);
                         });
                         
                         // числа на h
-                        hNumb[q].animate(VoltNumbAttr, fTime, function(){
-                        hNumb[q].animate(numbAttr, sTime);
+                        hNumb[n-1-q].animate(VoltNumbAttr, fTime, function(){
+                        hNumb[n-1-q].animate(numbAttr, sTime);
                         });
 
                         _upperHLine.forEach( function(elem,i) {
@@ -585,83 +496,52 @@ function takt(q,x){
                         });
                         });
 
-                        // вентиль пропускает сигнал
-                        logicGate[q][x].animate({ fill: voltageCL}, fTime, function(){
-                        logicGate[q][x].animate(logicGateAttr, sTime);
+                        logicGate[normQ][normX].animate({ fill: voltageCL}, fTime, function(){
+                        logicGate[normQ][normX].animate(logicGateAttr, sTime);
                         });
 
-                        // CH линия над вентилем
-                        // upperCToHLine[q][x].line.animate({stroke: voltageCL}, fTime, function(){
-                        // upperCToHLine[q][x].line.animate({stroke: defaultCL}, sTime);
-                        // });
+                        upperCToHLine[n-q-1][normX].line.animate({stroke: voltageCL}, fTime, function(){
+                        upperCToHLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+                        });
 
-                        // upperInToOutLine[q][x].line.animate({stroke: voltageCL}, fTime, function(){
-                        // upperInToOutLine[q][x].line.animate({stroke: defaultCL}, sTime);
-                        // });
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke: voltageCL}, fTime, function(){
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+                        });
 
 
-                        // Находим номера линий H и Output, которые сработают после прохождения
-                        // сигнала через вентиль
-                        var nextQ = nextState(tableB[x][q]);
-                        var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
+                        var qqq = getFloor(tableB[normX][normQ]);
+                        var xxx = getDecimal(tableB[normX][normQ]);
+                        qqq = parseInt(qqq,base);
+                        xxx = parseInt(xxx,base);
+                        qqq = qqq * 1;
+                        xxx = xxx * 1;
                         
 
-                        // upperHLine[q][n-1-nextQ].line.animate({stroke: voltageCL}, fTime, function(){
-                        // upperHLine[q][n-1-nextQ].line.animate({stroke: defaultCL}, sTime);
-                        // });
+                        upperHLine[normQ][n-1-qqq].line.animate({stroke: voltageCL}, fTime, function(){
+                        upperHLine[normQ][n-1-qqq].line.animate({stroke: defaultCL}, sTime);
+                        });
 
-                        // upperOutLine[q][base-1-nextX].line.animate({stroke: voltageCL}, fTime, function(){
-                        // upperOutLine[q][base-1-nextX].line.animate({stroke: defaultCL}, sTime);
-                        // });
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke: voltageCL}, fTime, function(){
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
+                        });
                         
-                        hLine[n-1-nextQ].line.animate({stroke: voltageCL}, fTime, function(){
-                        hLine[n-1-nextQ].line.animate({stroke: defaultCL}, sTime);
+                        hLine[n-1-qqq].line.animate({stroke: voltageCL}, fTime, function(){
+                        hLine[n-1-qqq].line.animate({stroke: defaultCL}, sTime);
                         });
 
                         // числа на h
-                        hNumb[nextQ].animate(VoltNumbAttr, fTime, function(){
-                        hNumb[nextQ].animate(numbAttr, sTime);
+                        hNumb[qqq].animate(VoltNumbAttr, fTime, function(){
+                        hNumb[qqq].animate(numbAttr, sTime);
                         });
 
-                        outputLine[base-1-nextX].line.animate({stroke: voltageCL}, fTime, function(){
-                        outputLine[base-1-nextX].line.animate({stroke: defaultCL}, sTime);
+                        outputLine[base - 1 - xxx].line.animate({stroke: voltageCL}, fTime, function(){
+                        outputLine[base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
                         });
 
                         //числа на выходе
-                        outNumb[nextX].animate(VoltNumbAttr, fTime, function(){
-                        outNumb[nextX].animate(numbAttr, sTime);
+                        outNumb[xxx].animate(VoltNumbAttr, fTime, function(){
+                        outNumb[xxx].animate(numbAttr, sTime);
                         });
-
-                        _upperOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          elem.line.animate({stroke:voltageCL}, fTime, function(){
-                          elem.line.animate({stroke: defaultCL}, sTime);
-                        });
-                        });
-
-                         _upperHLineAfterWorkingLG.forEach( function(elem,i) {
-                          elem.line.animate({stroke:voltageCL}, fTime, function(){
-                          elem.line.animate({stroke: defaultCL}, sTime);
-                        });
-                        });
-
-                         _upperCToHLineAfterWorkingLG.forEach( function(elem,i) {
-                          elem.line.animate({stroke:voltageCL}, fTime, function(){
-                          elem.line.animate({stroke: defaultCL}, sTime);
-                        });
-                        });
-
-                         _upperInToOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          elem.line.animate({stroke:voltageCL}, fTime, function(){
-                          elem.line.animate({stroke: defaultCL}, sTime);
-                        });
-                        }); 
-                         
-
-                        
                         
 }
 
@@ -711,8 +591,8 @@ function takt(q,x){
        
        i--;
        currentCell = tableB[currentInput][currentState];
-       currentState = nextState(currentCell);
-       currentOutput = nextOutput(currentCell);
+       currentState = getFloor(currentCell);
+       currentOutput = getDecimal(currentCell);
        result += currentOutput;
        
        output.value += currentOutput;
@@ -756,18 +636,30 @@ document.getElementById("run").addEventListener("click", function() {
     var q = state.options[state.selectedIndex].value;
     q = +q;
     
-      runMachine(q, number);   
+    runMachine(q, number);     
     
- }); 
+    
+}); 
 
-function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q){
+function takt1(q,x,taktCount){
   
-  
- 	var tailMinusX = base - 1 - x;
- 	var tailMinusQ = n -1 - q;
+  var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
+      _lowerCToHLine = [], _upperCToHLine = [];
+  prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,x,q);
 
-  var qqq = nextState(tableB[x][q]);
-                        var xxx = nextOutput(tableB[x][q]);
+  var _lowerInLine1 = [], _lowerInToOutLine1 = [], _upperHLine1 = [],
+      _lowerCToHLine1 = [], _upperCToHLine1 = [];
+prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q);
+
+  function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q){
+  //console.table(tableB);
+  var normX = x;
+  var normQ = q;
+  x = base - 1 - x;
+  q = n -1 - q;
+
+  var qqq = getFloor(tableB[normX][normQ]);
+                        var xxx = getDecimal(tableB[normX][normQ]);
                         qqq = parseInt(qqq,base);
                         xxx = parseInt(xxx,base);
                         qqq = qqq * 1;
@@ -775,11 +667,11 @@ function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,
 
   for (var i = 0; i < n; i++){
     // x линия для каждого из i блоков, соединенных с x входной линией
-    _lowerInLine1.push(lowerInLine[i][x]);
+    _lowerInLine1.push(lowerInLine[i][normX]);
     // соединение вход-выход через вентиль
-    _lowerInToOutLine1.push(lowerInToOutLine[i][x]);
+    _lowerInToOutLine1.push(lowerInToOutLine[i][normX]);
 
-   // if(i !== q && q !== (n-1-qqq)){
+   // if(i !== normQ && q !== (n-1-qqq)){
     _upperHLine1.push(upperHLine[i][q]);
     //}
 
@@ -794,12 +686,12 @@ function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,
 
   for (var i = 0; i < base; i++) {
     for (var j = 0; j < n; j++){
-      var qq = nextState(tableB[i][j]);
+      var qq = getFloor(tableB[i][j]);
                         qq = parseInt(qq,base);
                         qq = qq * 1;
 
- if (qq == q ){_upperCToHLine1.push(upperCToHLine[j][i]); }
-                        // if (qq == q && j !== (n-q-1) && i !== x){_upperCToHLine1.push(upperCToHLine[j][i]); }
+ if (qq == normQ ){_upperCToHLine1.push(upperCToHLine[j][i]); }
+                        // if (qq == normQ && j !== (n-q-1) && i !== normX){_upperCToHLine1.push(upperCToHLine[j][i]); }
     }
   }
 
@@ -807,38 +699,21 @@ function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,
 
 }
 
-function takt1(q,x,taktCount){
-  
-   var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
-      _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
-       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [];
+                        var normX = x;
+                        var normQ = q;
 
-  prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG);
+                        x = base - 1 - x;
+                        q = n -1 - q;
 
-//   var _lowerInLine1 = [], _lowerInToOutLine1 = [], _upperHLine1 = [],
-//       _lowerCToHLine1 = [], _upperCToHLine1 = [];
-// prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q);
-
-
-
-                        
-
-                        var tailMinusX = base - 1 - x;
-  						var tailMinusQ = n -1 - q;
-
-                        
-
-                        function turnOn(){
+                        function firstStep(){
                                                   
                           console.log("first work");
-
-                        // питание на линию входа
-                        inputLine[tailMinusX].line.animate({stroke: voltageCL}, fTime);
+                          // питание на линию входа
+                        inputLine[x].line.animate({stroke: voltageCL}, fTime);
                         
                         
                         // числа на входе
-                        inNumb[x].animate(VoltNumbAttr, fTime);
+                        inNumb[base-1-x].animate(VoltNumbAttr, fTime);
                         
                         
 
@@ -855,15 +730,15 @@ function takt1(q,x,taktCount){
                         });
 
                         // питание на с
-                        cLine[tailMinusQ].line.animate({stroke:voltageCL}, fTime);
+                        cLine[q].line.animate({stroke:voltageCL}, fTime);
                         
                         
                         // числа на с
-                        cNumb[q].animate(VoltNumbAttr, fTime);
+                        cNumb[n-1-q].animate(VoltNumbAttr, fTime);
                         
                        
 
-                        underRectLine[q].line.animate({stroke:voltageCL},fTime);
+                        underRectLine[n-q-1].line.animate({stroke:voltageCL},fTime);
                         
                         
 
@@ -874,12 +749,12 @@ function takt1(q,x,taktCount){
                         });
 
                         // питание на h
-                        hLine[tailMinusQ].line.animate({stroke:voltageCL},fTime);
+                        hLine[q].line.animate({stroke:voltageCL},fTime);
                         
                         
                         
                         // числа на h
-                        hNumb[q].animate(VoltNumbAttr, fTime);
+                        hNumb[n-1-q].animate(VoltNumbAttr, fTime);
                         
                         
 
@@ -895,204 +770,178 @@ function takt1(q,x,taktCount){
                        
                         });
 
-                        logicGate[q][x].animate({ fill: voltageCL},fTime);
+                        logicGate[normQ][normX].animate({ fill: voltageCL},fTime);
                         }
                           
-                        function process(){
-                          
+                        function secondStep(){
+                          // prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q);
                           console.log("second work");
-                          // ОТКЛЮЧАЕМ ВСЕ, ЧТО БЫЛО НА ПЕРВОМ ШАГЕ
+                          logicGate[normQ][normX].animate({ fill: "#00AA7F"},fTime);
+
+                          upperCToHLine[n-q-1][normX].line.animate({stroke: voltageCL},fTime);
+                        
+                        
+
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke: voltageCL},fTime);
+
+
+
+                        var qqq = getFloor(tableB[normX][normQ]);
+                        var xxx = getDecimal(tableB[normX][normQ]);
+                        qqq = parseInt(qqq,base);
+                        xxx = parseInt(xxx,base);
+                        qqq = qqq * 1;
+                        xxx = xxx * 1;
+
+                         upperHLine[normQ][n-1-qqq].line.animate({stroke: voltageCL},fTime);
+                        
+                        
+
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke: voltageCL},fTime);
+                        
+                        
+                        
+                        hLine[n-1-qqq].line.animate({stroke: voltageCL},fTime);
+                        
+                        
+
+                        // числа на h
+                        hNumb[qqq].animate(VoltNumbAttr, fTime);
+                        
+                        
+
+                        outputLine[base - 1 - xxx].line.animate({stroke: voltageCL},fTime);
+                        
+                        
+
+                        //числа на выходе
+                        outNumb[xxx].animate(VoltNumbAttr,fTime);
+                        
+                       
 
                           // питание на линию входа
                         
-                        inputLine[tailMinusX].line.animate({stroke: defaultCL}, fTime);
+                        inputLine[x].line.animate({stroke: defaultCL}, sTime);
                         
                         // числа на входе
                         
-                        inNumb[x].animate(numbAttr, fTime);
+                        inNumb[base-1-x].animate(numbAttr, sTime);
                         
 
-                        _lowerInLine.forEach( function(elem,i) {
+                        _lowerInLine1.forEach( function(elem,i) {
                           
-                          elem.line.animate({stroke: defaultCL}, fTime);
+                          elem.line.animate({stroke: defaultCL}, sTime);
                         
                         });
 
-                        _lowerInToOutLine.forEach( function(elem,i) {
+                        _lowerInToOutLine1.forEach( function(elem,i) {
                           
-                          elem.line.animate({stroke: defaultCL}, fTime);
+                          elem.line.animate({stroke: defaultCL}, sTime);
                         
                         });
 
                         // питание на с
                         
-                        cLine[tailMinusQ].line.animate({stroke: defaultCL}, fTime);
+                        cLine[q].line.animate({stroke: defaultCL}, sTime);
                         
                         // числа на с
                         
-                        cNumb[q].animate(numbAttr, fTime);
+                        cNumb[n-1-q].animate(numbAttr, sTime);
                        
 
                         
-                        underRectLine[q].line.animate({stroke:defaultCL},  fTime);
+                        underRectLine[n-q-1].line.animate({stroke:defaultCL},  sTime);
                         
 
-                        _lowerCToHLine.forEach( function(elem,i) {
+                        _lowerCToHLine1.forEach( function(elem,i) {
                           
-                          elem.line.animate({stroke: defaultCL}, fTime);
+                          elem.line.animate({stroke: defaultCL}, sTime);
                         
                         });
 
                         // питание на h
                         
-                        hLine[tailMinusQ].line.animate({stroke:defaultCL}, fTime);
-                        
+                        hLine[q].line.animate({stroke:defaultCL}, sTime);
+                        //hLine[qqq].line.animate({stroke:voltageCL}, sTime);
                         
                         
                         // числа на h
                         
-                        hNumb[q].animate(numbAttr, fTime);
+                        hNumb[n-1-q].animate(numbAttr, sTime);
                         
 
-                        _upperHLine.forEach( function(elem,i) {
+                        _upperHLine1.forEach( function(elem,i) {
                           
-                          elem.line.animate({stroke: defaultCL}, fTime);
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                        
+                        });
+                        
+                        _upperCToHLine1.forEach( function(elem,i) {
+                          
+                          elem.line.animate({stroke: defaultCL}, sTime);
+                       
+                        });
+
+                        // ТЕСТ
+                        //upperCToHLine[normQ][normX].line.animate({stroke: voltageCL},fTime);
+                        //  upperInToOutLine[normQ][normX].line.animate({stroke: voltageCL},fTime);
+                        }
+                        
+                        function thirdStep(){
+                          var qqq = getFloor(tableB[normX][normQ]);
+                        var xxx = getDecimal(tableB[normX][normQ]);
+                        qqq = parseInt(qqq,base);
+                        xxx = parseInt(xxx,base);
+                        qqq = qqq * 1;
+                        xxx = xxx * 1;
+
+                           console.log("third work");
+                        logicGate[normQ][normX].animate(logicGateAttr, sTime);
+                        
+
+                        
+                        upperCToHLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+                        
+
+                        
+                        upperInToOutLine[n-q-1][normX].line.animate({stroke: defaultCL}, sTime);
+
+                       
+                        upperHLine[normQ][n-1-qqq].line.animate({stroke: defaultCL}, sTime);
+                        
+
+                        
+                        upperOutLine[normQ][base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
+                        
+                        
+                        
+                        hLine[n-1-qqq].line.animate({stroke: defaultCL}, sTime);
+                        
+
+                        // числа на h
+                        
+                        hNumb[qqq].animate(numbAttr, sTime);
+                        
+
+                        
+                        outputLine[base - 1 - xxx].line.animate({stroke: defaultCL}, sTime);
+                        
+
+                        //числа на выходе
+                        
+                        outNumb[xxx].animate(numbAttr, sTime);
+
+                       
+                       _upperHLine.forEach( function(elem,i) {
+                          
+                          elem.line.animate({stroke: defaultCL}, sTime);
                         
                         });
                         
                         _upperCToHLine.forEach( function(elem,i) {
                           
-                          elem.line.animate({stroke: defaultCL}, fTime);
+                          elem.line.animate({stroke: defaultCL}, sTime);
                        
-                        });
-
-                        // ВКЛЮЧАЕМ ОСТАЛЬНОЕ
-
-                          logicGate[q][x].animate({ fill: "#00AA7F"},sTime);
-
-                          // upperCToHLine[q][x].line.animate({stroke: voltageCL},fTime);
-                        
-                        
-
-                        // upperInToOutLine[q][x].line.animate({stroke: voltageCL},fTime);
-
-
-
-                         // Находим номера линий H и Output, которые сработают после прохождения
-                        // сигнала через вентиль
-                        var nextQ = nextState(tableB[x][q]);
-                        var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
-
-                        // upperHLine[q][n-1-nextQ].line.animate({stroke: voltageCL},fTime);
-                        
-                        
-
-                        //upperOutLine[q][base-1-nextX].line.animate({stroke: voltageCL},fTime);
-                        
-                        
-                        
-                        hLine[n-1-nextQ].line.animate({stroke: voltageCL},sTime);
-                        
-                        
-
-                        // числа на h
-                        hNumb[nextQ].animate(VoltNumbAttr, sTime);
-                        
-                        
-
-                        outputLine[base-1-nextX].line.animate({stroke: voltageCL},sTime);
-                        
-                        
-
-                        //числа на выходе
-                        outNumb[nextX].animate(VoltNumbAttr,sTime);
-
-                        _upperOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: voltageCL}, sTime);
-                        });
-                       
-
-                         _upperHLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: voltageCL}, sTime);
-                        });
-                        
-
-                         _upperCToHLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: voltageCL}, sTime);
-                        });
-                       
-
-                         _upperInToOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: voltageCL}, sTime);
-                        });
-                        
-                        
-                       
-
-                        
-                        }
-                        
-                        function turnOff(){
-                          
-
-                           console.log("third work");
-
-                           var nextQ = nextState(tableB[x][q]);
-                        var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
-
-                        logicGate[q][x].animate(logicGateAttr, fTime);
-                        
-
-                        
-                       hLine[n-1-nextQ].line.animate({stroke: defaultCL},fTime);
-                        
-                        
-
-                        // числа на h
-                        hNumb[nextQ].animate(numbAttr, fTime);
-                        
-                        
-
-                        outputLine[base-1-nextX].line.animate({stroke: defaultCL},fTime);
-                        
-                        
-
-                        //числа на выходе
-                        outNumb[nextX].animate(numbAttr,fTime);
-
-                        _upperOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: defaultCL}, fTime);
-                        });
-                       
-
-                         _upperHLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: defaultCL}, fTime);
-                        });
-                        
-
-                         _upperCToHLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: defaultCL}, fTime);
-                        });
-                       
-
-                         _upperInToOutLineAfterWorkingLG.forEach( function(elem,i) {
-                          
-                          elem.line.animate({stroke: defaultCL}, fTime);
                         });
 
                         }
@@ -1103,8 +952,8 @@ function takt1(q,x,taktCount){
                      
 
 
-                        // var qqq = nextState(tableB[normX][normQ]);
-                        // var xxx = nextOutput(tableB[normX][normQ]);
+                        // var qqq = getFloor(tableB[normX][normQ]);
+                        // var xxx = getDecimal(tableB[normX][normQ]);
                         // qqq = parseInt(qqq,base);
                         // xxx = parseInt(xxx,base);
                         // qqq = qqq * 1;
@@ -1112,15 +961,15 @@ function takt1(q,x,taktCount){
                         
 
                         if (taktCount % 3 == 1){
-                          turnOn();
+                          firstStep();
                         }
 
                         if (taktCount % 3 == 2){
-                          process();
+                          secondStep();
                         }
 
                         if (taktCount % 3 == 0){
-                          turnOff();
+                          thirdStep();
                         }
                         
                         
@@ -1164,8 +1013,8 @@ document.getElementById("takt").addEventListener("click", function() {
     if (taktCount % 3 == 0){
       target--;
        currentCell = tableB[currentInput][taktQ];
-       taktQ = nextState(currentCell);
-       currentOutput = nextOutput(currentCell);
+       taktQ = getFloor(currentCell);
+       currentOutput = getDecimal(currentCell);
        output.value += currentOutput;
     }
     

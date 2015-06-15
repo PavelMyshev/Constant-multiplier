@@ -7,13 +7,73 @@
     <title>Machine</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/multiplier.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="favicon.ico" /> 
 
     <script src="js/snap.svg-min.js"></script>
     <script src="js/snap.svg.zpd.js"></script>
+
+   <div id="menu">
+     <a>
+         <span class="glyphicon glyphicon-menu-hamburger" style="color: rgb(255, 255, 255);">
+     </a>
+    </div>
+
+         <script src="js/vendor/modernizr.custom.14328.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script>
+        <script src="js/vendor/responsive-carousel.js"></script>
+        <script src="js/loader.js"></script>
+        <script src="js/main1.js"></script>
+        <script src="js/fonts.js"></script>
+        <script src="js/vendor/PxLoader.js"></script>
+        <script src="js/vendor/PxLoaderImage.js"></script>
+        <script src="js/vendor/PxLoaderVideo.js"></script>
+        <script src="js/vendor/director.min.js"></script>
+
    
     
+   
 </head>
 <body>
+
+
+
+            <div id="contents" style="display: block; opacity: 1;">
+                <div id="close">
+                    <a><img src="img/close.svg"></a>
+                </div>
+                <div id="toc">
+                    <h3>SETTINGS</h3>
+                  
+                    <form>   
+                    <div class="form-group">
+                        <label for="base" style="color: #1B1B1B;">Base</label>
+                         <input type="text" class="form-control" id="base" placeholder="Enter base">
+                    </div>
+                    <div class="form-group">
+                        <label for="multiplier" style="color: #1B1B1B;">Multiplier</label>
+                         <input type="text" class="form-control" id="multiplier" placeholder="Enter multiplier">
+                    </div>
+                    <label for="theme" style="color: #1B1B1B;">Theme</label>
+                    <select class="form-control" id="theme">
+                    <option>default</option>
+                    <option>classic</option>
+                    <option>ocean</option>                    
+                    </select>
+                    </br>
+                    <input class="btn btn-default" type="button" value="Save" id="save">
+                    </form>     
+          
+                       
+               
+                        
+
+                    
+                </div>
+            </div>
+
      <svg id="svg" width="2000" height="3000"></svg>
          
     <div class="controls">

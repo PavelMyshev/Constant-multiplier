@@ -10,6 +10,11 @@ body  {
     bottom: 50px;
     z-index: 100;
 }
+#base, #multiplier, #theme  {
+  width: 150px;
+  margin-left: 110px;
+}
+
 label {
 color: #FFF; 
 }
