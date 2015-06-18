@@ -63,6 +63,7 @@ var amendment = rectWidth/2;
 var defaultCL;
 var voltageCL;
 var themeName = theme;
+var textAttr;
 
 function nextOutput(num) { // после запятой
 
@@ -97,13 +98,14 @@ function setTheme(name){
        logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
        lineNodeAttr = {fill:"#000000",stroke: "#FFE99B"};
        numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FFE99B"};
+       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#FDF7FE",stroke: "#FFE99B"};
        VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
        lGTAttr = {stroke: "#050C04",strokeWidth: 0};
        defaultCL = '#FFE99B';
        voltageCL = '#D02222';
        document.body.style.background = "#0D4D2B";
     break;
-     case `ocean`:
+     case `qq`:
        logicGateAttr = {fill:"#BDBDBD", stroke: "#595959", strokeWidth: 2};
        lineNodeAttr = {fill:"#FBFEFE",stroke: "#B7EEFC"};
        numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#C0FCFF"};
@@ -153,7 +155,7 @@ function setTheme(name){
        voltageCL = '#D02222';
        document.body.style.background = "#09131C";
     break;
-    default:
+    case `ocean`:
     logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
        lineNodeAttr = {fill:"#000000",stroke: "#000000"};
        numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
@@ -393,7 +395,89 @@ for (var i = 0; i < n; i++){
   hNumb[i] = snap.paper.text(hLine[n-1-i].line.attr("x1")-space/2, hLine[n-1-i].line.attr("y1")-space/4, ''+i).attr(numbAttr);
 }
 
-   
+// надписи для входной/ выходной шины
+function TTT(){
+  //var diff = inNumb[1];
+  //console.log(diff);
+  
+
+  var inputName = "In";
+  var InLineMiddle = Math.floor(base / 2); // индекс средней линии
+  var InNameMiddle = Math.floor(inputName.length / 2); // индекс среднего символа в надписи
+  var x = inputLine[InLineMiddle].line.attr("x1");
+  var y = inputLine[InLineMiddle].line.attr("y1");
+  x = +x;
+  x -= space/2;
+  y = +y;
+  y -=19;
+  
+console.log(InLineMiddle);
+console.log(InNameMiddle);
+var startXCord = InNameMiddle * 10;
+x -= startXCord;
+for (var i = 0; i < inputName.length; i++){
+    snap.paper.text(x,y,inputName[i]).attr(textAttr);
+    x += 10;
+}
+
+// выход
+var outputName = "Out";
+var OutLineMiddle = Math.floor(base / 2); // индекс средней линии
+ var OutNameMiddle = Math.floor(outputName.length / 2); // индекс среднего символа в надписи
+   x = outputLine[OutLineMiddle].line.attr("x1");
+   y = outputLine[OutLineMiddle].line.attr("y1");
+  x = +x;
+  x -= space/2;
+  y = +y;
+  y -=19;
+
+   startXCord = OutNameMiddle * 10;
+x -= startXCord;
+for (var i = 0; i < outputName.length; i++){
+    snap.paper.text(x,y,outputName[i]).attr(textAttr);
+    x += 10;
+}
+
+// control INPUT
+var CInName = "Cin";
+var cLineMiddle = Math.floor(n / 2); // индекс средней линии
+ var CInNameMiddle = Math.floor(CInName.length / 2); // индекс среднего символа в надписи
+   x = cLine[cLineMiddle].line.attr("x1");
+   y = cLine[cLineMiddle].line.attr("y1");
+  x = +x;
+  x -= space/2;
+  y = +y;
+  y -=19;
+
+   startXCord = CInNameMiddle * 10;
+x -= startXCord;
+for (var i = 0; i < CInName.length; i++){
+    snap.paper.text(x,y,CInName[i]).attr(textAttr);
+    x += 10;
+}
+
+// control OUTPUT
+var COutName = "Cout";
+var hLineMiddle = Math.floor(n / 2); // индекс средней линии
+ var COutNameMiddle = Math.floor(COutName.length / 2); // индекс среднего символа в надписи
+   x = hLine[hLineMiddle].line.attr("x1");
+   y = hLine[hLineMiddle].line.attr("y1");
+  x = +x;
+  x -= space/2;
+  y = +y;
+  y -=19;
+
+   startXCord = COutNameMiddle * 10;
+x -= startXCord;
+for (var i = 0; i < COutName.length; i++){
+    snap.paper.text(x,y,COutName[i]).attr(textAttr);
+    x += 10;
+}
+
+
+}
+
+TTT();  
 
 var fTime = 500;
 var sTime = 1000;
@@ -715,7 +799,7 @@ function takt(q,x){
        currentInput = +currentInput;      
        takt(currentState,currentInput);
        // && i < 0 иначе может быть середина числа, где идут подряд нули
-       if(currentInput == 0 && currentState == 0 && currentOutput == 0 ){
+       if(currentInput == 0 && currentState == 0 && currentOutput == 0 && i < 0){
           clearInterval(timerId);
           //включаем элементы управления после завершения работы
           document.getElementById('output').disabled = false;
@@ -730,10 +814,15 @@ function takt(q,x){
        currentCell = tableB[currentInput][currentState];
        currentState = nextState(currentCell);
        currentOutput = nextOutput(currentCell);
-       result += currentOutput;
-       
-       output.value += currentOutput;
 
+       // result += currentOutput;
+       
+       // output.value += currentOutput;
+       output.value = currentOutput + result;
+
+       result = currentOutput + result;
+       
+       
        
        
   
@@ -1158,7 +1247,7 @@ var currentCell;
 var currentInput;
 var target;
 var output;
-var currentOutput;      // очередной разряд результата умножения
+var taktCurrentOutput;      // очередной разряд результата умножения
 
 var currentState;
 var softNextTarget, nextCurrentInput,nextCurrentCell;
@@ -1166,13 +1255,17 @@ var softNextTarget, nextCurrentInput,nextCurrentCell;
 
 var nexState, nextInput;
 var taktArray = [];
-
+  var taktResult;
+  var taktOutput;
 document.getElementById("takt").addEventListener("click", function() {
 
+
+
     if(!isRun){
-     output = document.getElementById('output');
+      taktResult = '';
+     taktOutput = document.getElementById('output');
      
-      output.value = '';  
+      taktOutput.value = '';  
     taktNumber = document.getElementById("input").value;
     taktState = document.getElementById("state");
     taktQ = taktState.options[taktState.selectedIndex].value;
@@ -1182,7 +1275,10 @@ document.getElementById("takt").addEventListener("click", function() {
     isRun = 1;
     currentState = taktQ;
   }
-     
+   
+
+
+
     // currentInput = (target - taktCount) >= 0 ? taktNumber.charAt(target) : '0';
     // currentInput = +currentInput;
 
@@ -1192,7 +1288,11 @@ document.getElementById("takt").addEventListener("click", function() {
     // currentCell = tableB[currentInput][currentState];
     // currentState = nextState(currentCell); // nextState
     
-
+    // т.к. первая цифра на выход подается только при втором нажатии кнопки 
+if (taktCount > 0){
+    taktOutput.value = taktCurrentOutput + taktResult;
+    taktResult = taktCurrentOutput + taktResult;
+    }
     
     console.log("takt: " + taktCount);
     console.log("На вход подали: " + nextInput);
@@ -1214,7 +1314,8 @@ document.getElementById("takt").addEventListener("click", function() {
       // Подготовим следующий массив для следующего клика
        
         currentCell = tableB[currentInput][taktQ];
-        nexState = nextState(currentCell); 
+        nexState = nextState(currentCell);
+        taktCurrentOutput = nextOutput(currentCell); 
 
         nextInput = (target-1) >= 0 ? taktNumber.charAt(target-1) : '0';
         nextInput = +nextInput;
@@ -1235,6 +1336,7 @@ document.getElementById("takt").addEventListener("click", function() {
      
         currentCell = tableB[nextInput][nexState];
         nexState = nextState(currentCell);
+        taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-2) >= 0 ? taktNumber.charAt(target-2) : '0';
        nextInput = +nextInput;
@@ -1265,6 +1367,7 @@ document.getElementById("takt").addEventListener("click", function() {
      
      currentCell = tableB[nextInput][nexState];
         nexState = nextState(currentCell);
+        taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-taktCount-1) >= 0 ? taktNumber.charAt(target-taktCount-1) : '0';
        nextInput = +nextInput;
@@ -1276,6 +1379,10 @@ document.getElementById("takt").addEventListener("click", function() {
        }
     }   
     
+    // if (taktCount > 0){
+    // taktOutput.value = taktCurrentOutput + taktResult;
+    // taktResult = taktCurrentOutput + taktResult;
+    // }
      //target--;
      taktCount++;
 });     

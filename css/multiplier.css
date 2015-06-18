@@ -32,3 +32,16 @@ color: #FFF;
   padding: 4px; 
   margin:4px;
 }
+
+
+
+/* font-family: "DroidMonoRegular"; */
+@font-face {
+    font-family: "DroidMonoRegular";
+    src: url("../fonts/DroidMonoRegular/DroidMonoRegular.eot");
+    src: url("../fonts/DroidMonoRegular/DroidMonoRegular.eot?#iefix")format("embedded-opentype"),
+    url("../fonts/DroidMonoRegular/DroidMonoRegular.woff") format("woff"),
+    url("../fonts/DroidMonoRegular/DroidMonoRegular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
