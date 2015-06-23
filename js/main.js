@@ -62,7 +62,7 @@ var VoltNumbAttr;
 var lGTAttr;
 var rectWidth = 4;
 var amendment = rectWidth/2;
-var defaultCL;
+// var defaultCL;
 var voltageCL, voltageAttr;
 var themeName = theme;
 var textAttr;
@@ -94,127 +94,66 @@ function setCircuitSize(base,n){
 
 function setTheme(name){
   switch(name){
-    case `default`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#595959", strokeWidth: 2};
-       lineNodeAttr = {fill:"#FDF7FE",stroke: "#7AE798"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#7AE798"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#AA55FF';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#16B563";
-    break;
-    case `classic`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
-       lineNodeAttr = {fill:"#000000",stroke: "#FFE99B"};
-       numbAttr =  {fontSize: '12px',fill:"#FFE99B",stroke: "#FFE99B"};
-       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#FFE99B",stroke: "#FFE99B"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#FFE99B';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#0D4D2B";
-    break;
-     case `qq`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#595959", strokeWidth: 2};
-       lineNodeAttr = {fill:"#FBFEFE",stroke: "#B7EEFC"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#C0FCFF"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#75DDF0'; 
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#375F6B";
-    break;
-    case `deep ocean`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#023926", strokeWidth: 2};
-       lineNodeAttr = {fill:"#FBFEFE",stroke: "#B7EEFC"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#5C9DF9"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#02BAFB';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#0D1A20";
-    break;
-    case `red`:
-       logicGateAttr = {fill:"#2B3036", stroke: "#595959", strokeWidth: 2};
-       lineNodeAttr = {fill:"#FBFEFE",stroke: "#B7EEFC"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#FD5D39';
-       voltageCL = '#55FF7F';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#621211";
-    break;
+        
      case `neon`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
-       lineNodeAttr = {fill:"#111111",stroke: "#00F7FF"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#08CED6';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#111111";
-    break;
-    case `xam`:
-       logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
-       lineNodeAttr = {fill:"#FFFFFF",stroke: "#00F7FF"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#9DBFDC';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#09131C";
-    break;
-    case `ocean`:
-    logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
        lineNodeAttr = {fill:"#000000",stroke: "#7CE0D8"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
-       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#7CE0D8",stroke: "#7CE0D8"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#7CE0D8';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#0B443D";
-    break;
-     case `ocean1`:
-    logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
-       lineNodeAttr = {fill:"#4981CC",stroke: "#B3C8E7"};
-       numbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#FBD9BB"};
-       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#7CE0D8",stroke: "#7CE0D8"};
-       VoltNumbAttr =  {fontSize: '12px',fill:"#FDF7FE",stroke: "#D02222"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#B3C8E7';
-       voltageCL = '#D02222';
-       voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
-       document.body.style.background = "#20468D";
-    break;
-     case `ocean2`:
-    logicGateAttr = {fill:"#BDBDBD", stroke: "#000000", strokeWidth: 2};
-       lineNodeAttr = {fill:"#000000",stroke: "#7CE0D8"};
+       //numbers
        numbAttr =  {fontSize: '12px',fill:"#12575C",stroke: "#12575C"};
-       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#7CE0D8",stroke: "#7CE0D8"};
        VoltNumbAttr =  {fontSize: '12px',fill:"#02D9DE",stroke: "#02D9DE"};
-       lGTAttr = {stroke: "#050C04",strokeWidth: 0};
-       defaultCL = '#12575C';
-       voltageCL = '#02D9DE';
+       //text
+       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#7CE0D8",stroke: "#7CE0D8"};
+       // text in gate
+       lGTAttr = {fill:"#2A2A2A", stroke: "#2A2A2A",strokeWidth: 0};
+       //line
        defaultAttr = {fill:"#12575C", stroke: "#12575C", strokeWidth: 2};
        voltageAttr = {fill:"#02D9DE", stroke: "#02D9DE", strokeWidth: 4};
+       //gate
+       logicGateAttr = {fill:"#9E9FAA", stroke: "#12575C", strokeWidth: 2};
        voltageLGCProcess = {fill:"#95C331"};
        voltageLGC = {fill:"#02D9DE"};
        document.body.style.background = "#111111";
     break;
+     case `red`:
+       lineNodeAttr = {fill:"#AE4353",stroke: "#FECFD9"};
+       //numbers
+       numbAttr =  {fontSize: '12px',fill:"#F0E4E7",stroke: "#F0E4E7"};
+       VoltNumbAttr =  {fontSize: '12px',fill:"#FFFF00",stroke: "#FFFF00"};
+       //text
+       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#F0E4E7",stroke: "#F0E4E7"};
+       // text in gate
+       lGTAttr = {fill:"#2E2E2F", stroke: "#111112",strokeWidth: 0};
+       //line
+       defaultAttr = {fill:"#FECFD9", stroke: "#FECFD9", strokeWidth: 2};
+       voltageAttr = {fill:"#A59EDE", stroke: "#FFFF00", strokeWidth: 4};
+       //gate
+       logicGateAttr = {fill:"#BDBDBD", stroke: "#6D6D70", strokeWidth: 2};
+       voltageLGCProcess = {fill:"#00FF7B"};
+       voltageLGC = {fill:"#FFFF00"}; //  A0182C
+       document.body.style.background = "#5C151E";
+    break;
+    case `classic`:
+       lineNodeAttr = {fill:"#000000",stroke: "#FFE99B"};
+       //numbers
+       numbAttr =  {fontSize: '12px',fill:"#FFE99B",stroke: "#FFE99B"};
+       VoltNumbAttr =  {fontSize: '12px',fill:"#D02222",stroke: "#D02222"};
+       //text
+       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#FFE99B",stroke: "#FFE99B"};
+       // text in gate
+       lGTAttr = {fill:"#080808", stroke: "#080808",strokeWidth: 0};
+       //line
+       defaultAttr = {fill:"#FFE99B", stroke: "#FFE99B", strokeWidth: 2};
+       voltageAttr = {fill:"#D02222", stroke: "#D02222", strokeWidth: 4};
+       //gate
+       logicGateAttr = {fill:"#BDBDBD", stroke: "#080808", strokeWidth: 2};
+       voltageLGCProcess = {fill:"#00FF7B"};
+       voltageLGC = {fill:"#D02222"}; 
+       document.body.style.background = "#0D4D2B";
+    break;
+    
   }  
 } 
-setTheme('ocean2');
-// setTheme(themeName);
+
+setTheme(themeName);
 setCircuitSize(base,n);
 //setCircuitSize(base,n);
 // **********************
@@ -543,7 +482,9 @@ var delay = fTime + sTime * 2;
 function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
 	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG){
 
-  
+  // x = parseInt(x,base);
+  // q = parseInt(q,base);
+
   var tailMinusX = base - 1 - x;
   var tailMinusQ = n -1 - q;
 
@@ -580,6 +521,8 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
   // После прохождения сигнала черезе вентиль, сигнал пойдет
   // на линию H и линию Output. На все линии, связанные с данными, 
   // должен пойти сигнал.
+  // x = parseInt(x,base);
+  // q = parseInt(q,base);
   var nextQ = nextState(tableB[x][q]);
   var nextX = nextOutput(tableB[x][q]);
   nextQ = parseInt(nextQ,base);
@@ -984,7 +927,8 @@ function takt1(q,x,taktCount){
 // prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q);
 
 
-
+x = parseInt(x,base);
+  q = parseInt(q,base);
                         
 
                         var tailMinusX = base - 1 - x;
@@ -1326,7 +1270,7 @@ document.getElementById("takt").addEventListener("click", function() {
     taktNumber = document.getElementById("input").value;
     taktState = document.getElementById("state");
     taktQ = taktState.options[taktState.selectedIndex].value;
-    taktQ = +taktQ;
+    //taktQ = +taktQ;
 
     target = taktNumber.length - 1;
     isRun = 1;
@@ -1351,15 +1295,13 @@ if (taktCount > 0){
     taktResult = taktCurrentOutput + taktResult;
     }
     
-    console.log("takt: " + taktCount);
-    console.log("На вход подали: " + nextInput);
-    console.log("перехожу в состояние : " + nexState);
+    
     
 
     if(taktCount == 0){
 
       currentInput = (target) >= 0 ? taktNumber.charAt(target) : '0';
-      currentInput = +currentInput;
+      //currentInput = +currentInput;
 
       taktArray[taktCount] = new Array(3);
 
@@ -1369,13 +1311,14 @@ if (taktCount > 0){
       // console.log(taktArray);
       taktArray[0][0]();
       // Подготовим следующий массив для следующего клика
-       
+        currentInput = parseInt(currentInput,base);
+        taktQ = parseInt(taktQ,base);
         currentCell = tableB[currentInput][taktQ];
         nexState = nextState(currentCell);
         taktCurrentOutput = nextOutput(currentCell); 
 
         nextInput = (target-1) >= 0 ? taktNumber.charAt(target-1) : '0';
-        nextInput = +nextInput;
+        //nextInput = +nextInput;
 
         
 
@@ -1390,13 +1333,16 @@ if (taktCount > 0){
 
      taktArray[0][1]();
      taktArray[1][0]();
-     
+
+        nextInput = parseInt(nextInput,base);
+        nexState = parseInt(nexState,base);
+
         currentCell = tableB[nextInput][nexState];
         nexState = nextState(currentCell);
         taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-2) >= 0 ? taktNumber.charAt(target-2) : '0';
-       nextInput = +nextInput;
+       //nextInput = +nextInput;
 
         
 
@@ -1422,12 +1368,15 @@ if (taktCount > 0){
      taktArray[taktCount-1][1]();
      taktArray[taktCount][0]();
      
+     nextInput = parseInt(nextInput,base);
+        nexState = parseInt(nexState,base);
+
      currentCell = tableB[nextInput][nexState];
         nexState = nextState(currentCell);
         taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-taktCount-1) >= 0 ? taktNumber.charAt(target-taktCount-1) : '0';
-       nextInput = +nextInput;
+       //nextInput = +nextInput;
 
      taktArray[taktCount+1] = new Array(3);
 
