@@ -1,4 +1,4 @@
-document.getElementById("save").addEventListener("click", function() {
+document.getElementById("apply").addEventListener("click", function() {
 
     var base = document.getElementById("base").value;
     var multiplier = document.getElementById("multiplier").value;
@@ -7,17 +7,16 @@ document.getElementById("save").addEventListener("click", function() {
     base = +base;
     multiplier = +multiplier;
     
-    console.log(base + ' ' + multiplier + ' ' + theme );
     create(base, multiplier,theme);     
     
     
 }); 
 
-function create(b, multiplier,theme) {
-// var snap = Snap(3000,3000);
+function create(_base, multiplier,theme) {
+
 var snap = Snap("svg");
 
-var base = b;  // система исчисления
+var base = _base;       // система счисления
 var n = multiplier;     // множитель
 
 // функция переходов
@@ -37,9 +36,9 @@ function output(q,x){
 }
 
 // таблица переходов/выходных состояний
-var tableB = new Array(base);      
+var tableB = [];      
 for(var i = 0; i < base; i++){
-	tableB[i] = new Array(n); 
+	tableB[i] = []; 
 }
 
 // ини­циа­ли­зи­ро­вать B-таблицу
@@ -53,8 +52,8 @@ console.table(tableB);
 var space = 10;          // расстояние между линиями
 var middleSpace;         // место для центральной части умножителя
 var xPoint = 100;        // начальная 'x' координата
-var yPoint = 100;		 // начальная 'y' координата
-var busLength;           // длина шин (вход, выход и т.д.) 1150 
+var yPoint = 100;		     // начальная 'y' координата
+var busLength;           // длина шин (вход, выход и т.д.)
 var logicGateAttr;
 var lineNodeAttr;
 var numbAttr;
@@ -62,34 +61,29 @@ var VoltNumbAttr;
 var lGTAttr;
 var rectWidth = 4;
 var amendment = rectWidth/2;
-// var defaultCL;
-var voltageCL, voltageAttr;
+var voltageAttr;
 var themeName = theme;
 var textAttr;
 var voltageLGCProcess, voltageLGC;
+var logicGateWidth = 55, logicGateHeight = 25;
 
-function nextOutput(num) { // после запятой
 
-  // var temp = ( (num - Math.floor(num).toFixed(1) )[2];
-  // return 1 * temp;
-  var temp = num;
-  var afterComma = temp.substr(temp.indexOf(".") + 1);
-  return afterComma;
+// после разделителя
+function nextOutput(cell) { 
+
+  return cell.substr(cell.indexOf(".") + 1);
 }
 
-function nextState(num) { // целая часть
-  // return Math.floor(num);
-  // var streetaddress= addy.substr(0, addy.indexOf(','));
-  var temp = num;
-  var beforeComma = temp.substr(0, temp.indexOf('.'));
-  return beforeComma; 
+// перед разделителем
+function nextState(cell) { 
+  
+  return cell.substr(0, cell.indexOf('.')); 
 }  
 
-
-
+// размеры схемы
 function setCircuitSize(base,n){
   middleSpace = base * 60;
-  busLength = n * (10 +            2 * space + space * base + space + space * n + space + 25 + 2 * space + space + space * base);
+  busLength = n * (10 +    2 * space + space * base + space + space * n + space + 25 + 2 * space + space + space * base);
 }
 
 function setTheme(name){
@@ -155,7 +149,7 @@ function setTheme(name){
 
 setTheme(themeName);
 setCircuitSize(base,n);
-//setCircuitSize(base,n);
+
 // **********************
 // *** ОСНОВНЫЕ ЛИНИИ ***
 // **********************
@@ -172,61 +166,45 @@ var outputLine = [];     // линии выхода
 var upperOutLine = [];        // горизонтальные линии, идущие на выход
 for (var i = 0; i < n; i++){
        upperOutLine[i] = [];
-       for (var j = 0; j < base; j++){
-           upperOutLine[i][j] = 0;
-   }}
+    }
 
 var upperHLine = [];          // горизонтальные линии, идущие на H
 for (var i = 0; i < n; i++){
        upperHLine[i] = [];
-       for (var j = 0; j < n; j++){
-           upperHLine[i][j] = 0;
-   }}
+    }
 
 var underRectLine = [];       // линия под прямоугольниками, соединяющая C и H входы
 
 var lowerInLine = [];         // горизонтальные линии, идущие на вход
 for (var i = 0; i < n; i++){
        lowerInLine[i] = [];
-       for (var j = 0; j < base; j++){
-           lowerInLine[i][j] = 0;
-   }}
+    }
 
 var lowerInToOutLine = [];    // вертикальные линии, соединяющие вход и выход(часть под вентилем)
 for (var i = 0; i < n; i++){
        lowerInToOutLine[i] = [];
-       for (var j = 0; j < base; j++){
-           lowerInToOutLine[i][j] = 0;
-   }}
+    }
 
 var upperInToOutLine = [];    // вертикальные линии, соединяющие вход и выход(часть над вентилем)
 for (var i = 0; i < n; i++){
        upperInToOutLine[i] = [];
-       for (var j = 0; j < base; j++){
-           upperInToOutLine[i][j] = 0;
-   }}   
+    }   
 
 var lowerCToHLine = [];       // вертикальные линии, соединяющие C и H(часть под вентилем)
 for (var i = 0; i < n; i++){
        lowerCToHLine[i] = [];
-       for (var j = 0; j < base; j++){
-           lowerCToHLine[i][j] = 0;
-   }}
+    }
 
 var upperCToHLine = [];       // вертикальные линии, соединяющие C и H(часть над вентилем)
 for (var i = 0; i < n; i++){
        upperCToHLine[i] = [];
-       for (var j = 0; j < base; j++){
-           upperCToHLine[i][j] = 0;
-   }}   
+    }   
 
 
 var logicGate = [];     // логические вентили "AND"
    for (var i = 0; i < n; i++){
-       logicGate[i] = [];
-       for (var j = 0; j < base; j++){
-           logicGate[i][j] = 0;
-   }}
+          logicGate[i] = [];
+       }
 
 
 // линия, вместе с соединительными узлами
@@ -250,7 +228,7 @@ for (var i = 0; i < base; i++){
   
     inputLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
     xPoint += space;
-    //g.add(inputLine[i].line);
+    
 }
 
 // сделаем двойной пробел между линиями входа и линиями С
@@ -308,12 +286,12 @@ for (var i = 0; i < n; i++){
 xPoint += space;
 //создаем прямоугольники
  for (var i = 0; i < base; i++){
- 	logicGate[block][i] = snap.paper.rect(xPoint, yPoint, 55, 25).attr(logicGateAttr);
- 	var t1 = snap.paper.text(xPoint+3, yPoint+15, '&'+block.toString(base)+','+i.toString(base)).attr(lGTAttr);
- 	xPoint += 55;
+ 	logicGate[block][i] = snap.paper.rect(xPoint, yPoint, logicGateWidth, logicGateHeight).attr(logicGateAttr);
+ 	snap.paper.text(xPoint+3, yPoint+15, '&' + block.toString(base) + ',' + i.toString(base)).attr(lGTAttr);
+ 	xPoint += logicGateWidth;
  }
 
-yPoint = parseFloat(logicGate[block][0].attr("y")) + 25 + space;
+yPoint = parseFloat(logicGate[block][0].attr("y")) + logicGateHeight + space;
 // нижняя CH линия
 underRectLine[block] = Object.create(DiLine).constructor(cLine[n-1-block].line.attr("x1"), yPoint, hLine[n-1-block].line.attr("x1"), yPoint,
 													 cLine[n-1-block].line.attr("x1"), yPoint, hLine[n-1-block].line.attr("x1"), yPoint);
@@ -328,15 +306,15 @@ for (var i = 0; i < base; i++){
 
 //вертикальные линии, соединяющие вход и выход
 for (var i = 0; i < base; i++){
-  var q = nextState(tableB[i][block]);
 
+  var q = nextState(tableB[i][block]);
   var x = nextOutput(tableB[i][block]);
-  // console.log("current output: " + x);
+  
   q = parseInt(q,base);
   x = parseInt(x,base);
   q = +q;
   x = +x;
-  // console.log("current output1: " + x);
+  
   var x1 = parseFloat(logicGate[block][i].attr("x"))+ space;
   var y1 = lowerInLine[block][i].line.attr("y1");
   var x2 = parseFloat(logicGate[block][i].attr("x"))+ space;
@@ -344,14 +322,8 @@ for (var i = 0; i < base; i++){
    lowerInToOutLine[block][i] = Object.create(DiLine).constructor(x1,y1,x2,y2,x1,y1);
    y2 = parseFloat(logicGate[block][i].attr("y"));
 
-// console.log("current block: " + block);
-//    console.log("current i: " + i);
-//    console.log("trable: x: " + x);
-//    console.log("trable q: " + q);
-
    y1 = upperOutLine[block][Math.abs(base-1-x)].line.attr("y1");
    
-
    upperInToOutLine[block][i] = Object.create(DiLine).constructor(x1,y1,x2,y2,x1,y1);
 
    // вертикальные линии, соединяющие C и H
@@ -389,14 +361,11 @@ for (var i = 0; i < n; i++){
   hNumb[i] = snap.paper.text(hLine[n-1-i].line.attr("x1")-space/2, hLine[n-1-i].line.attr("y1")-space/4, ''+i).attr(numbAttr);
 }
 
-// надписи для входной/ выходной шины
-function TTT(){
-  //var diff = inNumb[1];
-  //console.log(diff);
-  
-
+// надписи для шин
+function createInscription(){
+  // INPUT
   var inputName = "In";
-  var InLineMiddle = Math.floor(base / 2); // индекс средней линии
+  var InLineMiddle = Math.floor(base / 2);             // индекс средней линии
   var InNameMiddle = Math.floor(inputName.length / 2); // индекс среднего символа в надписи
   var x = inputLine[InLineMiddle].line.attr("x1");
   var y = inputLine[InLineMiddle].line.attr("y1");
@@ -405,8 +374,6 @@ function TTT(){
   y = +y;
   y -=19;
   
-console.log(InLineMiddle);
-console.log(InNameMiddle);
 var startXCord = InNameMiddle * 10;
 x -= startXCord;
 for (var i = 0; i < inputName.length; i++){
@@ -414,9 +381,9 @@ for (var i = 0; i < inputName.length; i++){
     x += 10;
 }
 
-// выход
+// OUTPUT
 var outputName = "Out";
-var OutLineMiddle = Math.floor(base / 2); // индекс средней линии
+var OutLineMiddle = Math.floor(base / 2);               // индекс средней линии
  var OutNameMiddle = Math.floor(outputName.length / 2); // индекс среднего символа в надписи
    x = outputLine[OutLineMiddle].line.attr("x1");
    y = outputLine[OutLineMiddle].line.attr("y1");
@@ -434,7 +401,7 @@ for (var i = 0; i < outputName.length; i++){
 
 // control INPUT
 var CInName = "Cin";
-var cLineMiddle = Math.floor(n / 2); // индекс средней линии
+var cLineMiddle = Math.floor(n / 2);                 // индекс средней линии
  var CInNameMiddle = Math.floor(CInName.length / 2); // индекс среднего символа в надписи
    x = cLine[cLineMiddle].line.attr("x1");
    y = cLine[cLineMiddle].line.attr("y1");
@@ -452,7 +419,7 @@ for (var i = 0; i < CInName.length; i++){
 
 // control OUTPUT
 var COutName = "Cout";
-var hLineMiddle = Math.floor(n / 2); // индекс средней линии
+var hLineMiddle = Math.floor(n / 2);                   // индекс средней линии
  var COutNameMiddle = Math.floor(COutName.length / 2); // индекс среднего символа в надписи
    x = hLine[hLineMiddle].line.attr("x1");
    y = hLine[hLineMiddle].line.attr("y1");
@@ -471,7 +438,7 @@ for (var i = 0; i < COutName.length; i++){
 
 }
 
-TTT();  
+createInscription();  
 
 var fTime = 500;
 var sTime = 1000;
@@ -481,10 +448,7 @@ var delay = fTime + sTime * 2;
 // функция группирует линии, по которым должен пройти сигнал
 function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
 	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG){
-
-  // x = parseInt(x,base);
-  // q = parseInt(q,base);
-
+console.log("x: " + x);
   var tailMinusX = base - 1 - x;
   var tailMinusQ = n -1 - q;
 
@@ -518,19 +482,14 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
     }
   }
 
-  // После прохождения сигнала черезе вентиль, сигнал пойдет
+  // После прохождения сигнала через вентиль, сигнал пойдет
   // на линию H и линию Output. На все линии, связанные с данными, 
   // должен пойти сигнал.
-  // x = parseInt(x,base);
-  // q = parseInt(q,base);
   var nextQ = nextState(tableB[x][q]);
   var nextX = nextOutput(tableB[x][q]);
   nextQ = parseInt(nextQ,base);
   nextX = parseInt(nextX,base);
-  nextQ = +nextQ;
-  nextX = +nextX;
-//console.log(nextX);
-//console.log(nextQ);
+  
 	for (var i = 0; i < n; i++){
     // x линия для каждого из i блоков, соединенных с x входной линией
     _upperOutLineAfterWorkingLG.push(upperOutLine[i][base-1-nextX]);
@@ -563,50 +522,7 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
 
 }
 
-// document.getElementById("run").addEventListener("click", function() {
 
-//     var number = document.getElementById("input").value;
-//     var state = document.getElementById("state");
-//     var q = state.options[state.selectedIndex].value;
-//     q = +q;
-    
-    
-//     //takt(q,number);  
-//     //console.log("q is : " + q);
-//     var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
-//       _lowerCToHLine = [], _upperCToHLine = [];
-
-//   prepare(_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,0,q);
-
-   
-
-// function testPrepare(){
-//     _lowerInLine.forEach( function(elem,i) {
-//                           elem.line.animate(voltageAttr, fTime);
-//                         });
-    
-//     _lowerInToOutLine.forEach( function(elem,i) {
-//                           elem.line.animate(voltageAttr, fTime);
-//                         });
-   
-//     _upperHLine.forEach( function(elem,i) {
-//                           elem.line.animate(voltageAttr, fTime);
-//                         });
-  
-
-  
-//     _lowerCToHLine.forEach( function(elem,i) {
-//                           elem.line.animate(voltageAttr, fTime);
-//                         });
-    
-  
-// _upperCToHLine.forEach( function(elem,i) {
-//                           elem.line.animate(voltageAttr, fTime);
-//                         });
-// }
-
-
-// }); 
                       
 function takt(q,x){
   
@@ -619,7 +535,7 @@ function takt(q,x){
 
                        
                         var tailMinusX = base - 1 - x;
-  						var tailMinusQ = n -1 - q;
+  						          var tailMinusQ = n -1 - q;
 
                         // питание на линию входа
                         inputLine[tailMinusX].line.animate(voltageAttr, fTime, function(){
@@ -705,10 +621,7 @@ function takt(q,x){
                         var nextX = nextOutput(tableB[x][q]);
                         nextQ = parseInt(nextQ,base);
                         nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
                         
-
                         // upperHLine[q][n-1-nextQ].line.animate(voltageAttr, fTime, function(){
                         // upperHLine[q][n-1-nextQ].line.animate(defaultAttr, sTime);
                         // });
@@ -716,7 +629,7 @@ function takt(q,x){
                         // upperOutLine[q][base-1-nextX].line.animate(voltageAttr, fTime, function(){
                         // upperOutLine[q][base-1-nextX].line.animate(defaultAttr, sTime);
                         // });
-                        console.log(n-1-nextQ);
+                       
                         hLine[n-1-nextQ].line.animate(voltageAttr, fTime, function(){
                         hLine[n-1-nextQ].line.animate(defaultAttr, sTime);
                         });
@@ -765,10 +678,9 @@ function takt(q,x){
 }
 
 
-
-
-  //setInterval(takt, 5000,0,0);
-// загораются 2 линии q = 0 , x = 1, n = 4, base = 4
+// возможно, лучше альтернативная реализация через 
+// setTimeout , т.к. setInterval и setTimeout
+// работают по разному.
   function runMachine(q, _number){
 
       var number = _number;
@@ -786,17 +698,19 @@ function takt(q,x){
       document.getElementById('run').disabled = true;
       document.getElementById('takt').disabled = true;
       document.getElementById('state').disabled = true;
-      //
-       document.getElementById('output').style.backgroundColor = "#FFB802";
+      
+      document.getElementById('output').style.backgroundColor = "#FFB802";
       // т.к. в начале на вход подают младшие разряды числа
       var i = number.length - 1; 
       var timerId =  setInterval(function(){
 
        currentInput = i >= 0 ? number.charAt(i) : '0';
+       // перед передачей в другие функции, которые манипулируют линиями
+       // необходимо перейти к 10й системе, т.к. массивы основаны на 10-й
+       // системе
        currentInput = parseInt(currentInput,base);
-       currentState = parseInt(currentState,base); // на всякий случай  
-       // унарный плюс для преобразования в число
-       currentInput = +currentInput;      
+       currentState = parseInt(currentState,base); 
+        
        takt(currentState,currentInput);
        // && i < 0 иначе может быть середина числа, где идут подряд нули
        if(currentInput == 0 && currentState == 0 && currentOutput == 0 && i < 0){
@@ -815,105 +729,27 @@ function takt(q,x){
        currentState = nextState(currentCell);
        currentOutput = nextOutput(currentCell);
 
-       // result += currentOutput;
-       
-       // output.value += currentOutput;
        output.value = currentOutput + result;
-
        result = currentOutput + result;
        
-       
-       
-       
-  
+
   },delay);
 }
 
-//   function runMachine(q, _number){
 
-      
-   
-//       var i = number.length - 1; // т.к. в начале на вход подают младшие разряды числа
-//       var timerId =  setInterval(function go(){
-
-//        currentInput = i >= 0 ? number.charAt(i) : '0'; 
-//        currentInput = +currentInput;      // унарный плюс для преобразования в число
-//        takt(currentState,currentInput);
-
-//        if(есть что выполнять){setTimeout(go, delay);}       
-       
-  
-//   },delay);
-// }
-
-
-   
- //document.getElementById("xxx").addEventListener("click", function() {
-
-        
-    
-    
-//}); 
 
 document.getElementById("run").addEventListener("click", function() {
 
     var number = document.getElementById("input").value;
     var state = document.getElementById("state");
     var q = state.options[state.selectedIndex].value;
-    q = +q;
-    
-      runMachine(q, number);   
+      
+    runMachine(q, number);   
     
  }); 
 
-function prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q){
-  
-  
- 	var tailMinusX = base - 1 - x;
- 	var tailMinusQ = n -1 - q;
 
-  var qqq = nextState(tableB[x][q]);
-                        var xxx = nextOutput(tableB[x][q]);
-                        qqq = parseInt(qqq,base);
-                        xxx = parseInt(xxx,base);
-                        qqq = qqq * 1;
-                        xxx = xxx * 1;
-
-  for (var i = 0; i < n; i++){
-    // x линия для каждого из i блоков, соединенных с x входной линией
-    _lowerInLine1.push(lowerInLine[i][x]);
-    // соединение вход-выход через вентиль
-    _lowerInToOutLine1.push(lowerInToOutLine[i][x]);
-
-   // if(i !== q && q !== (n-1-qqq)){
-    _upperHLine1.push(upperHLine[i][q]);
-    //}
-
-  }
-
-
-  for (var i = 0; i < base; i++){
-    _lowerCToHLine1.push(lowerCToHLine[n-q-1][i]);
-    
-  }
-
-
-  for (var i = 0; i < base; i++) {
-    for (var j = 0; j < n; j++){
-      var qq = nextState(tableB[i][j]);
-                        qq = parseInt(qq,base);
-                        qq = qq * 1;
-
- if (qq == q ){_upperCToHLine1.push(upperCToHLine[j][i]); }
-                        // if (qq == q && j !== (n-q-1) && i !== x){_upperCToHLine1.push(upperCToHLine[j][i]); }
-    }
-  }
-
-
-
-}
-
-function takt1(q,x,taktCount){
+function takt51(q,x,taktCount){
   
    var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
       _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
@@ -921,25 +757,15 @@ function takt1(q,x,taktCount){
 
   prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
 	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG);
-
-//   var _lowerInLine1 = [], _lowerInToOutLine1 = [], _upperHLine1 = [],
-//       _lowerCToHLine1 = [], _upperCToHLine1 = [];
-// prepare1(_lowerInLine1,_lowerInToOutLine1,_lowerCToHLine1,_upperHLine1,_upperCToHLine1,x,q);
-
-
-x = parseInt(x,base);
-  q = parseInt(q,base);
                         
 
                         var tailMinusX = base - 1 - x;
-  						var tailMinusQ = n -1 - q;
+  						          var tailMinusQ = n -1 - q;
 
                         
                         if(taktCount == 1) {
                         return function turnOn(){
                                                   
-                          //console.log("first work");
-
                         // питание на линию входа
                         inputLine[tailMinusX].line.animate(voltageAttr, fTime);
                         
@@ -1008,7 +834,6 @@ x = parseInt(x,base);
                           if(taktCount == 2) {
                         return function process(){
                           
-                          console.log("second work");
                           // ОТКЛЮЧАЕМ ВСЕ, ЧТО БЫЛО НА ПЕРВОМ ШАГЕ
 
                           // питание на линию входа
@@ -1079,43 +904,26 @@ x = parseInt(x,base);
                           logicGate[q][x].animate(voltageLGCProcess,sTime);
 
                           // upperCToHLine[q][x].line.animate(voltageAttr,fTime);
-                        
-                        
+                          // upperInToOutLine[q][x].line.animate(voltageAttr,fTime);
 
-                        // upperInToOutLine[q][x].line.animate(voltageAttr,fTime);
-
-
-
-                         // Находим номера линий H и Output, которые сработают после прохождения
+                        // Находим номера линий H и Output, которые сработают после прохождения
                         // сигнала через вентиль
                         var nextQ = nextState(tableB[x][q]);
                         var nextX = nextOutput(tableB[x][q]);
                         nextQ = parseInt(nextQ,base);
                         nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
+                        
 
                         // upperHLine[q][n-1-nextQ].line.animate(voltageAttr,fTime);
-                        
-                        
-
-                        //upperOutLine[q][base-1-nextX].line.animate(voltageAttr,fTime);
-                        
-                        
+                        // upperOutLine[q][base-1-nextX].line.animate(voltageAttr,fTime);
                         
                         hLine[n-1-nextQ].line.animate(voltageAttr,sTime);
                         
-                        
-
                         // числа на h
                         hNumb[nextQ].animate(VoltNumbAttr, sTime);
                         
-                        
-
                         outputLine[base-1-nextX].line.animate(voltageAttr,sTime);
                         
-                        
-
                         //числа на выходе
                         outNumb[nextX].animate(VoltNumbAttr,sTime);
 
@@ -1142,42 +950,26 @@ x = parseInt(x,base);
                           elem.line.animate(voltageAttr, sTime);
                         });
                         
-                        
-                       
-
-                        
+                                               
                         }
                         }
                         if(taktCount == 3) {
                         return function turnOff(){
                           
-
-                           console.log("third work");
-
-                           var nextQ = nextState(tableB[x][q]);
+                        var nextQ = nextState(tableB[x][q]);
                         var nextX = nextOutput(tableB[x][q]);
                         nextQ = parseInt(nextQ,base);
                         nextX = parseInt(nextX,base);
-                        nextQ = +nextQ;
-                        nextX = +nextX;
-
+                        
                         logicGate[q][x].animate(logicGateAttr, fTime);
+                                                
+                        hLine[n-1-nextQ].line.animate(defaultAttr,fTime);
                         
-
-                        
-                       hLine[n-1-nextQ].line.animate(defaultAttr,fTime);
-                        
-                        
-
                         // числа на h
                         hNumb[nextQ].animate(numbAttr, fTime);
                         
-                        
-
                         outputLine[base-1-nextX].line.animate(defaultAttr,fTime);
                         
-                        
-
                         //числа на выходе
                         outNumb[nextX].animate(numbAttr,fTime);
 
@@ -1208,33 +1000,7 @@ x = parseInt(x,base);
 
                         
                         }
-
-                     
-
-
-                        // var qqq = nextState(tableB[normX][normQ]);
-                        // var xxx = nextOutput(tableB[normX][normQ]);
-                        // qqq = parseInt(qqq,base);
-                        // xxx = parseInt(xxx,base);
-                        // qqq = qqq * 1;
-                        // xxx = xxx * 1;
-                        
-
-                        // if (taktCount % 3 == 1){
-                        //   turnOn();
-                        // }
-
-                        // if (taktCount % 3 == 2){
-                        //   process();
-                        // }
-
-                        // if (taktCount % 3 == 0){
-                        //   turnOff();
-                        // }
-                        
-                        
-                        
-                        
+                                                                                                         
 }
 
 
@@ -1250,82 +1016,67 @@ var target;
 var output;
 var taktCurrentOutput;      // очередной разряд результата умножения
 
-var currentState;
-var softNextTarget, nextCurrentInput,nextCurrentCell;
-
-
 var nexState, nextInput;
 var taktArray = [];
-  var taktResult;
-  var taktOutput;
+var taktResult;
+var taktOutput;
+
 document.getElementById("takt").addEventListener("click", function() {
 
-
-
     if(!isRun){
-      taktResult = '';
+
+     taktResult = '';
      taktOutput = document.getElementById('output');
      
-      taktOutput.value = '';  
-    taktNumber = document.getElementById("input").value;
-    taktState = document.getElementById("state");
-    taktQ = taktState.options[taktState.selectedIndex].value;
-    //taktQ = +taktQ;
+     taktOutput.value = '';  
+     taktNumber = document.getElementById("input").value;
+     taktState = document.getElementById("state");
 
-    target = taktNumber.length - 1;
-    isRun = 1;
-    currentState = taktQ;
+     taktQ = taktState.options[taktState.selectedIndex].value;
+     taktQ = parseInt(taktQ,base);
+
+     target = taktNumber.length - 1;
+     isRun = 1;
+    
+
+        
   }
-   
-
-
-
-    // currentInput = (target - taktCount) >= 0 ? taktNumber.charAt(target) : '0';
-    // currentInput = +currentInput;
-
-   
-
-    
-    // currentCell = tableB[currentInput][currentState];
-    // currentState = nextState(currentCell); // nextState
-    
+     
     // т.к. первая цифра на выход подается только при втором нажатии кнопки 
-if (taktCount > 0){
-    taktOutput.value = taktCurrentOutput + taktResult;
-    taktResult = taktCurrentOutput + taktResult;
+    if (taktCount > 0){
+      taktOutput.value = taktCurrentOutput + taktResult;
+      taktResult = taktCurrentOutput + taktResult;
     }
-    
-    
     
 
     if(taktCount == 0){
 
       currentInput = (target) >= 0 ? taktNumber.charAt(target) : '0';
-      //currentInput = +currentInput;
+      currentInput = parseInt(currentInput,base);
 
       taktArray[taktCount] = new Array(3);
 
       for (var j = 0; j < 3; j++) {
-        taktArray[0][j] = takt1(taktQ, currentInput,j+1);
+        taktArray[0][j] = takt51(taktQ, currentInput,j+1);
       }
-      // console.log(taktArray);
+      
       taktArray[0][0]();
+
       // Подготовим следующий массив для следующего клика
-        currentInput = parseInt(currentInput,base);
-        taktQ = parseInt(taktQ,base);
         currentCell = tableB[currentInput][taktQ];
         nexState = nextState(currentCell);
         taktCurrentOutput = nextOutput(currentCell); 
 
         nextInput = (target-1) >= 0 ? taktNumber.charAt(target-1) : '0';
-        //nextInput = +nextInput;
-
+        
+        nextInput = parseInt(nextInput,base);
+        nexState = parseInt(nexState,base);
         
 
         taktArray[taktCount+1] = new Array(3);
 
        for (var j = 0; j < 3; j++) {
-         taktArray[taktCount+1][j] = takt1(nexState, nextInput,j+1);
+         taktArray[taktCount+1][j] = takt51(nexState, nextInput,j+1);
        }
     }
 
@@ -1334,62 +1085,50 @@ if (taktCount > 0){
      taktArray[0][1]();
      taktArray[1][0]();
 
-        nextInput = parseInt(nextInput,base);
-        nexState = parseInt(nexState,base);
+        
 
         currentCell = tableB[nextInput][nexState];
         nexState = nextState(currentCell);
         taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-2) >= 0 ? taktNumber.charAt(target-2) : '0';
-       //nextInput = +nextInput;
-
+       
+       nextInput = parseInt(nextInput,base);
+       nexState = parseInt(nexState,base);
         
 
         taktArray[taktCount+1] = new Array(3);
 
        for (var j = 0; j < 3; j++) {
-         taktArray[taktCount+1][j] = takt1(nexState, nextInput,j+1);
+         taktArray[taktCount+1][j] = takt51(nexState, nextInput,j+1);
        }
 
-      //  taktArray[taktCount+1] = new Array(3);
-
-      // for (var j = 0; j < 3; j++) {
-      //    taktArray[taktCount+1][j] = takt1(currentState, nextInput,j+1);
-      //  }
+      
     }   
 
 
     if(taktCount >= 2){
 
-    
-
      taktArray[taktCount-2][2]();
      taktArray[taktCount-1][1]();
      taktArray[taktCount][0]();
      
-     nextInput = parseInt(nextInput,base);
-        nexState = parseInt(nexState,base);
 
      currentCell = tableB[nextInput][nexState];
-        nexState = nextState(currentCell);
-        taktCurrentOutput = nextOutput(currentCell); 
+     nexState = nextState(currentCell);
+     taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-taktCount-1) >= 0 ? taktNumber.charAt(target-taktCount-1) : '0';
-       //nextInput = +nextInput;
-
+       nextInput = parseInt(nextInput,base);
+        nexState = parseInt(nexState,base);
      taktArray[taktCount+1] = new Array(3);
 
       for (var j = 0; j < 3; j++) {
-         taktArray[taktCount+1][j] = takt1(nexState, nextInput,j+1);
+         taktArray[taktCount+1][j] = takt51(nexState, nextInput,j+1);
        }
     }   
     
-    // if (taktCount > 0){
-    // taktOutput.value = taktCurrentOutput + taktResult;
-    // taktResult = taktCurrentOutput + taktResult;
-    // }
-     //target--;
+    
      taktCount++;
 });     
 
@@ -1452,10 +1191,7 @@ if (taktCount > 0){
     };
     document.getElementById('rotateR').onmouseup = clearIntervalF;
     document.getElementById('rotateR').onmouseleave = clearIntervalF;
-    
-    
-    
-    
+        
     document.onkeydown = function (e) {
         switch(e.keyCode) {
             case 37: // left
@@ -1503,16 +1239,3 @@ document.getElementById("fscreen").addEventListener("click", function() {
 });
 
 }   
-
-
-
-
-
-
-
-
-
-
-
-
-
