@@ -43,7 +43,7 @@ for(var i = 0; i < base; i++){
 
 // ини­циа­ли­зи­ро­вать B-таблицу
 for(var x = 0; x < base; x++) {
-	for(q = 0; q < n; q++) {
+	for(var q = 0; q < n; q++) {
 		tableB[x][q] = stateTransition(q,x) + '.' + output(q,x);
 	}
 }
@@ -68,17 +68,18 @@ var voltageLGCProcess, voltageLGC;
 var logicGateWidth = 55, logicGateHeight = 25;
 
 
+// перед разделителем
+function nextState(cell) { 
+  
+  return cell.substr(0, cell.indexOf('.')); 
+}  
+
 // после разделителя
 function nextOutput(cell) { 
 
   return cell.substr(cell.indexOf(".") + 1);
 }
 
-// перед разделителем
-function nextState(cell) { 
-  
-  return cell.substr(0, cell.indexOf('.')); 
-}  
 
 // размеры схемы
 function setCircuitSize(base,n){
@@ -208,6 +209,7 @@ var logicGate = [];     // логические вентили "AND"
 
 
 // линия, вместе с соединительными узлами
+// Digital line
 var DiLine = {         
 	constructor: function(x1, y1, x2, y2, ln1, ln2, rn1, rn2){
 		this.line = snap.paper.line(x1, y1, x2, y2).attr(defaultAttr);
@@ -441,14 +443,14 @@ for (var i = 0; i < COutName.length; i++){
 createInscription();  
 
 var fTime = 500;
-var sTime = 1000;
+var sTime = 2000;
 var delay = fTime + sTime * 2;
-
+delay = 3000;
                     
 // функция группирует линии, по которым должен пройти сигнал
 function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG){
-console.log("x: " + x);
+	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG =[]){
+
   var tailMinusX = base - 1 - x;
   var tailMinusQ = n -1 - q;
 
@@ -496,6 +498,13 @@ console.log("x: " + x);
     
     // горизонтальные линии, идущие на H
     _upperHLineAfterWorkingLG.push(upperHLine[i][n-1-nextQ]);
+  }
+
+  // нижние линии под вентилем, идущие на H
+  // добавлено 24.06.15 _lowerCToHLineAfterWorkingLG
+  for (var i = 0; i < base; i++){
+    _lowerCToHLineAfterWorkingLG.push(lowerCToHLine[nextQ][i]);
+    
   } 
 
   for (var j = 0; j < n; j++) {
@@ -528,10 +537,10 @@ function takt(q,x){
   
   var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
       _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
-       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [];
+       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [] ,_lowerCToHLineAfterWorkingLG =[];
 
   prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG);
+	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG =[]);
 
                        
                         var tailMinusX = base - 1 - x;
@@ -638,6 +647,17 @@ function takt(q,x){
                         hNumb[nextQ].animate(VoltNumbAttr, fTime, function(){
                         hNumb[nextQ].animate(numbAttr, sTime);
                         });
+                        // добавлено 24.06.15 underRectLine[nextQ]...
+                        underRectLine[nextQ].line.animate(voltageAttr, fTime, function(){
+                        underRectLine[nextQ].line.animate(defaultAttr,  sTime);
+                        });
+
+                        // добавлено 24.06.15 _lowerCToHLineAfterWorkingLG
+                        _lowerCToHLineAfterWorkingLG.forEach( function(elem,i) {
+                          elem.line.animate(voltageAttr, fTime, function(){
+                          elem.line.animate(defaultAttr, sTime);
+                        });
+                        });
 
                         outputLine[base-1-nextX].line.animate(voltageAttr, fTime, function(){
                         outputLine[base-1-nextX].line.animate(defaultAttr, sTime);
@@ -713,7 +733,7 @@ function takt(q,x){
         
        takt(currentState,currentInput);
        // && i < 0 иначе может быть середина числа, где идут подряд нули
-       if(currentInput == 0 && currentState == 0 && currentOutput == 0 && i < 0){
+       if( i < 0 && currentState == 0 && currentOutput == 0 ){
           clearInterval(timerId);
           //включаем элементы управления после завершения работы
           document.getElementById('output').disabled = false;
