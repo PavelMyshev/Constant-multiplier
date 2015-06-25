@@ -49,6 +49,8 @@ for(var x = 0; x < base; x++) {
 }
 console.table(tableB);
 
+var CHBigSpace = n > 10 ? 20 : 10;
+var inOutBigSpace = base > 10 ? 20 : 10;
 var space = 10;          // расстояние между линиями
 var middleSpace;         // место для центральной части умножителя
 var xPoint = 100;        // начальная 'x' координата
@@ -144,6 +146,24 @@ function setTheme(name){
        voltageLGC = {fill:"#D02222"}; 
        document.body.style.background = "#0D4D2B";
     break;
+    case `black and white`:
+       lineNodeAttr = {fill:"#FFFFFF",stroke: "#161616", strokeWidth: 2};
+       //numbers
+       numbAttr =  {fontSize: '12px',fill:"#161616",stroke: "#161616"};
+       VoltNumbAttr =  {fontSize: '12px',fill:"#D02222",stroke: "#D02222"};
+       //text
+       textAttr = {fontFamily: 'DroidMonoRegular', fontSize: '13px',fill:"#161616",stroke: "#161616"};
+       // text in gate
+       lGTAttr = {fill:"#080808", stroke: "#080808",strokeWidth: 0};
+       //line
+       defaultAttr = {fill:"#161616", stroke: "#161616", strokeWidth: 2};
+       voltageAttr = {fill:"#D02222", stroke: "#D02222", strokeWidth: 4};
+       //gate 
+       logicGateAttr = {fill:"#D9D9D9", stroke: "#161616", strokeWidth: 2};
+       voltageLGCProcess = {fill:"#00FF7B"};
+       voltageLGC = {fill:"#D02222"}; 
+       document.body.style.background = "#FFFFFF";
+    break;
     
   }  
 } 
@@ -229,18 +249,18 @@ var DiLine = {
 for (var i = 0; i < base; i++){
   
     inputLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
-    xPoint += space;
+    xPoint += inOutBigSpace;
     
 }
 
 // сделаем двойной пробел между линиями входа и линиями С
-xPoint += space;
+xPoint += inOutBigSpace;
 
 // рисуем линии C
 for (var i = 0; i < n; i++){
     
     cLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
-    xPoint += space;
+    xPoint += CHBigSpace;
 }
 
 
@@ -251,17 +271,17 @@ xPoint += middleSpace;
 for (var i = 0; i < n; i++){
     
     hLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
-    xPoint += space;
+    xPoint += CHBigSpace;
 }
 
 // сделаем двойной провел между линиями H и линиями выхода
-xPoint += space;
+xPoint += inOutBigSpace;
 
 // рисуем линии выхода
 for (var i = 0; i < base; i++){
     
     outputLine[i] = Object.create(DiLine).constructor(xPoint,yPoint, xPoint, busLength);
-    xPoint += space;
+    xPoint += inOutBigSpace;
 }
 
 var block = 0;
@@ -443,13 +463,12 @@ for (var i = 0; i < COutName.length; i++){
 createInscription();  
 
 var fTime = 500;
-var sTime = 2000;
+var sTime = 1000;
 var delay = fTime + sTime * 2;
-delay = 3000;
                     
 // функция группирует линии, по которым должен пройти сигнал
 function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG =[]){
+	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG){
 
   var tailMinusX = base - 1 - x;
   var tailMinusQ = n -1 - q;
@@ -537,10 +556,10 @@ function takt(q,x){
   
   var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
       _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
-       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [] ,_lowerCToHLineAfterWorkingLG =[];
+       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [] , _lowerCToHLineAfterWorkingLG = [];
 
   prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG =[]);
+	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG);
 
                        
                         var tailMinusX = base - 1 - x;
@@ -773,10 +792,10 @@ function takt51(q,x,taktCount){
   
    var _lowerInLine = [], _lowerInToOutLine = [], _upperHLine = [],
       _lowerCToHLine = [], _upperCToHLine = [], _upperOutLineAfterWorkingLG = [],_upperHLineAfterWorkingLG = [],
-       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [];
+       _upperCToHLineAfterWorkingLG = [], _upperInToOutLineAfterWorkingLG = [], _lowerCToHLineAfterWorkingLG = [];
 
   prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
-	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG);
+	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG, _lowerCToHLineAfterWorkingLG);
                         
 
                         var tailMinusX = base - 1 - x;
