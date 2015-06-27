@@ -12,6 +12,7 @@ document.getElementById("apply").addEventListener("click", function() {
     
 }); 
 
+
 function create(_base, multiplier,theme) {
 
 var snap = Snap("svg");
@@ -19,22 +20,116 @@ var snap = Snap("svg");
 var base = _base;       // система счисления
 var n = multiplier;     // множитель
 
+function parseI(number,base){
+  var result = 0;
+  var ppower = 0;
+  var position = number.length - 1;
+
+////////////////////////////////////////////
+  function getNumb(number,currentPosition){
+  var result = '';
+  if(number[currentPosition] == '}'){
+    currentPosition --;
+
+    while(number[currentPosition] !== '{'){
+      result = number[currentPosition] + result;
+      currentPosition --;     
+    }
+    currentPosition --;
+  }
+  else {
+    result = number[currentPosition];
+    currentPosition --;
+  };
+
+  
+  position = currentPosition;
+  //console.log("Res: " + result);
+  return result;  
+  }
+///////////////////////////////////////////
+
+  while(position >= 0){
+    //console.log("Pos: " + position);
+    //console.log("Pow: " + ppower);
+    result += getNumb(number,position) * Math.pow(base,ppower);
+    //console.log("Res: " + result);
+    ppower ++;
+  }
+  
+  return result;
+}
+
+
+
+
+function toStr (number, base) {
+  var result = '';
+  var temp, temp1, residue;
+  var wrapper;
+
+  temp = number;
+
+  do{
+  temp1 = Math.floor(temp/base);
+  residue = temp - temp1 * base;
+  temp = temp1;
+  wrapper = residue > 9 ? '{' + residue + '}' : residue;
+  result = wrapper + result;
+  } while (temp != 0)
+  return result;
+}
+
+
 // функция переходов
 function stateTransition(q,x){
  
-  var result = (q + x * n).toString(base);
+  var result = toStr((q + x * n), base);
+  //result = '{10}34';
   
-  return result.length > 1 ? result.slice(0,-1) : '0';
+  var finalResult = '';
+  var currentPosition = result.length > 1 ? result.length-1 : 0;
+ 
+
+  if(result[currentPosition] == '}'){
+
+     while(result[currentPosition] !== '{'){
+  
+      currentPosition --;     
+    }
+    //currentPosition --;
+    if(currentPosition != 0){
+    return result.slice(0,currentPosition);
+    }
+    else {return 0;}
+  }
+
+  else {return result.length > 1 ? result.slice(0,-1) : '0';}
+  
 }
 
 //функция выходов
 function output(q,x){
-  
-  var result = (q + x * n).toString(base);
-  
-   return result[result.length-1];
-}
 
+  var result = toStr((q + x * n), base);
+  var finalResult = '';
+  var currentPosition = result.length-1;
+  
+
+  if(result[currentPosition] == '}'){
+
+    while(result[currentPosition] !== '{'){
+      finalResult = result[currentPosition] + finalResult;
+      currentPosition --;     
+    }
+    finalResult = '{' + finalResult;
+    return finalResult;
+  }
+  else {return result[result.length-1]};
+}
+  
+//    var tttt = stateTransition(0,7);
+// console.log(tttt);
 // таблица переходов/выходных состояний
 var tableB = [];      
 for(var i = 0; i < base; i++){
@@ -49,8 +144,8 @@ for(var x = 0; x < base; x++) {
 }
 console.table(tableB);
 
-var CHBigSpace = n > 10 ? 20 : 10;
-var inOutBigSpace = base > 10 ? 20 : 10;
+var CHBigSpace = n >  100 ? 30 : (n > 10 ? 20 : 10);
+var inOutBigSpace = base >  100 ? 30 : (base > 10 ? 20 : 10);
 var space = 10;          // расстояние между линиями
 var middleSpace;         // место для центральной части умножителя
 var xPoint = 100;        // начальная 'x' координата
@@ -309,7 +404,7 @@ xPoint += space;
 //создаем прямоугольники
  for (var i = 0; i < base; i++){
  	logicGate[block][i] = snap.paper.rect(xPoint, yPoint, logicGateWidth, logicGateHeight).attr(logicGateAttr);
- 	snap.paper.text(xPoint+3, yPoint+15, '&' + block.toString(base) + ',' + i.toString(base)).attr(lGTAttr);
+ 	snap.paper.text(xPoint+3, yPoint+15, '&' + toStr(block, base) + ',' + toStr(i,base)).attr(lGTAttr);
  	xPoint += logicGateWidth;
  }
 
@@ -332,8 +427,8 @@ for (var i = 0; i < base; i++){
   var q = nextState(tableB[i][block]);
   var x = nextOutput(tableB[i][block]);
   
-  q = parseInt(q,base);
-  x = parseInt(x,base);
+  q = parseI(q,base);
+  x = parseI(x,base);
   q = +q;
   x = +x;
   
@@ -469,7 +564,8 @@ var delay = fTime + sTime * 2;
 // функция группирует линии, по которым должен пройти сигнал
 function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_upperCToHLine,_upperOutLineAfterWorkingLG,
 	_upperHLineAfterWorkingLG,_upperCToHLineAfterWorkingLG,_upperInToOutLineAfterWorkingLG,_lowerCToHLineAfterWorkingLG){
-
+console.log("x :" + x);
+console.log("q :" + q);
   var tailMinusX = base - 1 - x;
   var tailMinusQ = n -1 - q;
 
@@ -497,7 +593,7 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
     for (var i = 0; i < base; i++){
       var currentQ = nextState(tableB[i][j]);
       // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentQ = parseInt(currentQ,base);
+                        currentQ = parseI(currentQ,base);
                         currentQ = +currentQ;
                         if (currentQ == q){_upperCToHLine.push(upperCToHLine[j][i]); }
     }
@@ -508,8 +604,8 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
   // должен пойти сигнал.
   var nextQ = nextState(tableB[x][q]);
   var nextX = nextOutput(tableB[x][q]);
-  nextQ = parseInt(nextQ,base);
-  nextX = parseInt(nextX,base);
+  nextQ = parseI(nextQ,base);
+  nextX = parseI(nextX,base);
   
 	for (var i = 0; i < n; i++){
     // x линия для каждого из i блоков, соединенных с x входной линией
@@ -530,7 +626,7 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
     for (var i = 0; i < base; i++){
       var currentQ = nextState(tableB[i][j]);
       // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentQ = parseInt(currentQ,base);
+                        currentQ = parseI(currentQ,base);
                         currentQ = +currentQ;
                         if (currentQ == nextQ){_upperCToHLineAfterWorkingLG.push(upperCToHLine[j][i]); }
     }
@@ -540,7 +636,7 @@ function prepare(q,x,_lowerInLine,_lowerInToOutLine,_lowerCToHLine,_upperHLine,_
     for (var i = 0; i < base; i++){
       var currentX = nextOutput(tableB[i][j]);
       // преобразуем к 10й системе, т.к. программа работает в 10й системе
-                        currentX = parseInt(currentX,base);
+                        currentX = parseI(currentX,base);
                         currentX = +currentX;
                         if (currentX == nextX){_upperInToOutLineAfterWorkingLG.push(upperInToOutLine[j][i]); }
     }
@@ -647,8 +743,8 @@ function takt(q,x){
                         // сигнала через вентиль
                         var nextQ = nextState(tableB[x][q]);
                         var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
+                        nextQ = parseI(nextQ,base);
+                        nextX = parseI(nextX,base);
                         
                         // upperHLine[q][n-1-nextQ].line.animate(voltageAttr, fTime, function(){
                         // upperHLine[q][n-1-nextQ].line.animate(defaultAttr, sTime);
@@ -724,7 +820,7 @@ function takt(q,x){
 
       var number = _number;
       var currentState = q;
-      var currentInput;       // очередной разряд входного числа
+      var currentInput = '';       // очередной разряд входного числа
       var currentCell;        // ячейка таблицы для выбора q и x
       var currentOutput;      // очередной разряд результата умножения
       var result = '';
@@ -743,12 +839,27 @@ function takt(q,x){
       var i = number.length - 1; 
       var timerId =  setInterval(function(){
 
-       currentInput = i >= 0 ? number.charAt(i) : '0';
+          //var symbol = '';
+          if(number[i] == '}'){
+            currentInput = ''
+            while(number[i] !== '{'){
+              currentInput = number[i] + currentInput;
+              i --;     
+            }
+            currentInput = number[i] + currentInput;
+           // i --;
+          }
+          else {
+            currentInput = i >= 0 ? number.charAt(i) : '0';;
+            //i --;
+          }
+console.log("INPUT: " + currentInput);
+       //currentInput = i >= 0 ? number.charAt(i) : '0';
        // перед передачей в другие функции, которые манипулируют линиями
        // необходимо перейти к 10й системе, т.к. массивы основаны на 10-й
        // системе
-       currentInput = parseInt(currentInput,base);
-       currentState = parseInt(currentState,base); 
+       currentInput = parseI(currentInput,base);
+       currentState = parseI(currentState,base); 
         
        takt(currentState,currentInput);
        // && i < 0 иначе может быть середина числа, где идут подряд нули
@@ -949,8 +1060,8 @@ function takt51(q,x,taktCount){
                         // сигнала через вентиль
                         var nextQ = nextState(tableB[x][q]);
                         var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
+                        nextQ = parseI(nextQ,base);
+                        nextX = parseI(nextX,base);
                         
 
                         // upperHLine[q][n-1-nextQ].line.animate(voltageAttr,fTime);
@@ -997,8 +1108,8 @@ function takt51(q,x,taktCount){
                           
                         var nextQ = nextState(tableB[x][q]);
                         var nextX = nextOutput(tableB[x][q]);
-                        nextQ = parseInt(nextQ,base);
-                        nextX = parseInt(nextX,base);
+                        nextQ = parseI(nextQ,base);
+                        nextX = parseI(nextX,base);
                         
                         logicGate[q][x].animate(logicGateAttr, fTime);
                                                 
@@ -1072,7 +1183,7 @@ document.getElementById("takt").addEventListener("click", function() {
      taktState = document.getElementById("state");
 
      taktQ = taktState.options[taktState.selectedIndex].value;
-     taktQ = parseInt(taktQ,base);
+     taktQ = parseI(taktQ,base);
 
      target = taktNumber.length - 1;
      isRun = 1;
@@ -1091,7 +1202,7 @@ document.getElementById("takt").addEventListener("click", function() {
     if(taktCount == 0){
 
       currentInput = (target) >= 0 ? taktNumber.charAt(target) : '0';
-      currentInput = parseInt(currentInput,base);
+      currentInput = parseI(currentInput,base);
 
       taktArray[taktCount] = new Array(3);
 
@@ -1108,8 +1219,8 @@ document.getElementById("takt").addEventListener("click", function() {
 
         nextInput = (target-1) >= 0 ? taktNumber.charAt(target-1) : '0';
         
-        nextInput = parseInt(nextInput,base);
-        nexState = parseInt(nexState,base);
+        nextInput = parseI(nextInput,base);
+        nexState = parseI(nexState,base);
         
 
         taktArray[taktCount+1] = new Array(3);
@@ -1132,8 +1243,8 @@ document.getElementById("takt").addEventListener("click", function() {
 
        nextInput = (target-2) >= 0 ? taktNumber.charAt(target-2) : '0';
        
-       nextInput = parseInt(nextInput,base);
-       nexState = parseInt(nexState,base);
+       nextInput = parseI(nextInput,base);
+       nexState = parseI(nexState,base);
         
 
         taktArray[taktCount+1] = new Array(3);
@@ -1158,8 +1269,8 @@ document.getElementById("takt").addEventListener("click", function() {
      taktCurrentOutput = nextOutput(currentCell); 
 
        nextInput = (target-taktCount-1) >= 0 ? taktNumber.charAt(target-taktCount-1) : '0';
-       nextInput = parseInt(nextInput,base);
-        nexState = parseInt(nexState,base);
+       nextInput = parseI(nextInput,base);
+        nexState = parseI(nexState,base);
      taktArray[taktCount+1] = new Array(3);
 
       for (var j = 0; j < 3; j++) {
