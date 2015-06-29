@@ -1388,4 +1388,18 @@ document.getElementById("fscreen").addEventListener("click", function() {
 
 });
 
+$(document).ready(
+    function(){
+      
+      var select = document.getElementById('state');
+
+      for (var i = 0; i < n; i++){
+      var opt = document.createElement('option');
+      var q = i.toString(base);
+      opt.value = +q;
+      opt.innerHTML = q;
+        select.appendChild(opt);
+      }
+    });
+
 }   

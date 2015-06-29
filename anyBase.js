@@ -58,7 +58,7 @@ function toStr (number, base) {
 	return result;
 }
 
-var one = '{49}10{33}';
+var one = '{13}{44}9';
 var radix = 50;
 var mult = 3;
 var two = parseI(one,radix);
